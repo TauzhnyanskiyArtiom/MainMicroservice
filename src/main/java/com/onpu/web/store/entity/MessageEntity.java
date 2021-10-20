@@ -20,10 +20,6 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "message")
 @Entity
-@JsonIdentityInfo(
-        property = "id",
-        generator = ObjectIdGenerators.PropertyGenerator.class
-)
 public class MessageEntity {
 
     @Id

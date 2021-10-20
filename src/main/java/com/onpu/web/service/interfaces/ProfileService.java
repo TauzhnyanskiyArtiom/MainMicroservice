@@ -7,13 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProfileService {
-    UserEntity changeSubscription(UserEntity channel, UserEntity subscriber);
 
     UserEntity findById(String name);
-
-    List<UserSubscriptionEntity> getSubscribers(UserEntity channel);
-
-    UserSubscriptionEntity changeSubscriptionStatus(UserEntity channel, UserEntity subscriber);
 
     List<UserEntity> getUsers(Optional<String> optionalPrefixName);
 

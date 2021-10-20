@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.ProfileService;
+import com.onpu.web.service.interfaces.SubscriptionService;
 import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.entity.UserSubscriptionEntity;
 import lombok.AccessLevel;
@@ -21,6 +22,8 @@ import java.util.List;
 public class ProfileController {
 
     ProfileService profileService;
+
+    SubscriptionService subscriptionService;
 
     @GetMapping("{id}")
     @JsonView(Views.FullProfile.class)
@@ -40,7 +43,7 @@ public class ProfileController {
         if (subscriber.equals(channel)) {
             return channel;
         } else {
-            return profileService.changeSubscription(channel, subscriber);
+            return subscriptionService.changeSubscription(channel, subscriber);
         }
     }
 
@@ -50,7 +53,7 @@ public class ProfileController {
             @PathVariable("channelId") String channelId
     ) {
         UserEntity channel = profileService.findById(channelId);
-        return profileService.getSubscribers(channel);
+        return subscriptionService.getSubscribers(channel);
     }
 
     @PostMapping("change-status/{subscriberId}")
@@ -61,7 +64,7 @@ public class ProfileController {
     ) {
         UserEntity channel = oauthUser.getUser();
         UserEntity subscriber = profileService.findById(subscriberId);
-        return profileService.changeSubscriptionStatus(channel, subscriber);
+        return subscriptionService.changeSubscriptionStatus(channel, subscriber);
     }
 
 

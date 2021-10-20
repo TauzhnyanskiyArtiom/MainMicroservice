@@ -1,7 +1,6 @@
 package com.onpu.web.store.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.*;
 import com.onpu.web.api.views.Views;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

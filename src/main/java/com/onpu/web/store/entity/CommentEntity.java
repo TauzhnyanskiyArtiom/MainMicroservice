@@ -1,6 +1,9 @@
 package com.onpu.web.store.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.onpu.web.api.views.Views;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -28,6 +31,11 @@ public class CommentEntity {
     @ManyToOne
     @JoinColumn(name = "message_id")
     @JsonView(Views.FullComment.class)
+    @JsonIdentityReference
+    @JsonIdentityInfo(
+            property = "id",
+            generator = ObjectIdGenerators.PropertyGenerator.class
+    )
     MessageEntity message;
 
     @ManyToOne
