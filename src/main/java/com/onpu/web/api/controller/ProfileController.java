@@ -3,7 +3,7 @@ package com.onpu.web.api.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.api.views.Views;
-import com.onpu.web.service.interfaces.ProfileService;
+import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.service.interfaces.SubscriptionService;
 import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.entity.UserSubscriptionEntity;
@@ -21,14 +21,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProfileController {
 
-    ProfileService profileService;
+    UserService userService;
 
     SubscriptionService subscriptionService;
 
     @GetMapping("{id}")
     @JsonView(Views.FullProfile.class)
     public UserEntity get(@PathVariable("id") String userId) {
-        UserEntity user = profileService.findById(userId);
+        UserEntity user = userService.findById(userId);
         return user;
     }
 
@@ -38,7 +38,7 @@ public class ProfileController {
             @AuthenticationPrincipal OAuth2User oauthUser,
             @PathVariable("channelId") String channelId
     ) {
-        UserEntity channel = profileService.findById(channelId);
+        UserEntity channel = userService.findById(channelId);
         UserEntity subscriber = oauthUser.getUser();
         if (subscriber.equals(channel)) {
             return channel;
@@ -52,7 +52,7 @@ public class ProfileController {
     public List<UserSubscriptionEntity> subscribers(
             @PathVariable("channelId") String channelId
     ) {
-        UserEntity channel = profileService.findById(channelId);
+        UserEntity channel = userService.findById(channelId);
         return subscriptionService.getSubscribers(channel);
     }
 
@@ -63,7 +63,7 @@ public class ProfileController {
             @PathVariable("subscriberId") String subscriberId
     ) {
         UserEntity channel = oauthUser.getUser();
-        UserEntity subscriber = profileService.findById(subscriberId);
+        UserEntity subscriber = userService.findById(subscriberId);
         return subscriptionService.changeSubscriptionStatus(channel, subscriber);
     }
 

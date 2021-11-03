@@ -76,13 +76,4 @@ public class MessageController {
         messageService.deleteMessage(message);
     }
 
-//    private MessageEntity getMessageEntityOrThrowException(Long messageId){
-//        return messageRepository
-//                .findById(messageId)
-//                .orElseThrow(() ->
-//                        new NotFoundException(
-//                                String.format("Message with '%s' doesn't exist.", messageId
-//                                ))
-//                );
-//    }
 }

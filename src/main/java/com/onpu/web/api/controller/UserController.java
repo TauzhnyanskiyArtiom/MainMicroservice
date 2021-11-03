@@ -1,6 +1,6 @@
 package com.onpu.web.api.controller;
 
-import com.onpu.web.service.interfaces.ProfileService;
+import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +18,13 @@ import java.util.Optional;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class UserController {
-    ProfileService profileService;
+    UserService userService;
 
     @GetMapping
     public List<UserEntity> getUsers(
             @RequestParam(value = "prefixName", required = false) Optional<String> optionalPrefixName
     ){
-        System.out.println();
-        List<UserEntity> users = profileService.getUsers(optionalPrefixName);
+        List<UserEntity> users = userService.getUsers(optionalPrefixName);
 
         return users;
     }

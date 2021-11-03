@@ -30,7 +30,7 @@ public class CommentController {
 
     @PostMapping
     @JsonView(Views.FullComment.class)
-    public CommentEntity create(
+    public CommentEntity createComment(
             @RequestBody CommentEntity comment,
             @AuthenticationPrincipal OAuth2User oauthUser
     ) {
