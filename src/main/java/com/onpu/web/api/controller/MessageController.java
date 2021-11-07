@@ -70,8 +70,7 @@ public class MessageController {
     }
 
     @DeleteMapping("{message_id}")
-    public void deleteMessage(
-            @PathVariable("message_id") MessageEntity message) {
+    public void deleteMessage( @PathVariable("message_id") MessageEntity message) {
 
         messageService.deleteMessage(message);
     }

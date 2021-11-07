@@ -25,11 +25,6 @@ export default {
   },
   methods: {
     search() {
-      // this.$resource('/api/search/users{/id}').get({id:this.text}).then(result =>
-      //     result.json().then(data => {
-      //         this.users.splice(0, this.users.length)
-      //         this.users.push(...data)
-      //     })
       Vue.http.get('/api/search/users',{params: { prefixName:this.text }}).then(result =>
           result.json().then(data => {
             this.users.splice(0, this.users.length)

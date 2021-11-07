@@ -27,7 +27,7 @@ public class ProfileController {
 
     @GetMapping("{id}")
     @JsonView(Views.FullProfile.class)
-    public UserEntity get(@PathVariable("id") String userId) {
+    public UserEntity getProfile(@PathVariable("id") String userId) {
         UserEntity user = userService.findById(userId);
         return user;
     }

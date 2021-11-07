@@ -25,7 +25,6 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class CommentController {
 
-    UserRepository userRepository;
     CommentService commentService;
 
     @PostMapping

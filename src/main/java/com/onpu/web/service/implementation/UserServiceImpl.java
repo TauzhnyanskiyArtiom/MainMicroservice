@@ -20,7 +20,6 @@ public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
 
-    UserSubscriptionRepository userSubscriptionRepository;
 
     @Override
     public UserEntity findById(String name) {
