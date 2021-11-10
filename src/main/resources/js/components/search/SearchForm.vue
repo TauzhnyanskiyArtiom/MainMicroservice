@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     search() {
-      Vue.http.get('/api/search/users',{params: { prefixName:this.text }}).then(result =>
+      Vue.http.get('/api/search/users/name',{params: { prefixName:this.text }}).then(result =>
           result.json().then(data => {
             this.users.splice(0, this.users.length)
             this.users.push(...data)

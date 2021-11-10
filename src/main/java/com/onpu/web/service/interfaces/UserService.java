@@ -11,4 +11,5 @@ public interface UserService {
 
     List<UserEntity> getUsers(Optional<String> optionalPrefixName);
 
+    List<UserEntity> getAllUsers();
 }

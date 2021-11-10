@@ -10,6 +10,7 @@
 <script>
 import SearchRow from 'components/search/SearchRow.vue'
 import SearchForm from "components/search/SearchForm.vue";
+import Vue from "vue";
 
 export default {
   name: "Users",
@@ -22,6 +23,14 @@ export default {
       users: [],
     }
   },
+  beforeMount() {
+    Vue.http.get('/api/search/users').then(result =>
+        result.json().then(data => {
+          this.users.splice(0, this.users.length)
+          this.users.push(...data)
+        })
+    )
+  }
 }
 </script>
 
