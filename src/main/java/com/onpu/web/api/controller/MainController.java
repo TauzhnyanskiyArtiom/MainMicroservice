@@ -7,9 +7,12 @@ import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.repository.UserRepository;
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -17,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +36,9 @@ public class MainController {
     String profile;
 
     UserRepository userRepository;
+
+    @Qualifier("cashedMessageService")
+    @NonNull
     MessageService messageService;
 
     @GetMapping

@@ -7,8 +7,10 @@ import com.onpu.web.service.interfaces.MessageService;
 import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MessageController {
 
+    @Qualifier("cashedMessageService")
+    @NonNull
     MessageService messageService;
 
 

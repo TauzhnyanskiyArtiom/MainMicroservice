@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer"})
+@JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
 @Data
 @EqualsAndHashCode( of = {"id"})
 @Builder
