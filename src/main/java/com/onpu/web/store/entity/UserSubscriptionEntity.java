@@ -5,10 +5,7 @@ import com.onpu.web.api.views.Views;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -23,7 +20,7 @@ public class UserSubscriptionEntity implements Serializable {
     UserSubscriptionId id;
 
     @MapsId("channelId")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonView(Views.IdName.class)
     @JsonIdentityReference
     @JsonIdentityInfo(
@@ -33,7 +30,7 @@ public class UserSubscriptionEntity implements Serializable {
     UserEntity channel;
 
     @MapsId("subscriberId")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonView(Views.IdName.class)
     @JsonIdentityReference
     @JsonIdentityInfo(
