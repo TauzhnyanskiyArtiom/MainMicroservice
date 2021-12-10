@@ -4,8 +4,10 @@ import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class UserController {
+
+    @Qualifier("loggedUserService")
+    @NonNull
     UserService userService;
 
     @GetMapping("name")

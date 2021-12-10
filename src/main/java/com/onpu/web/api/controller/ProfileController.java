@@ -8,8 +8,10 @@ import com.onpu.web.service.interfaces.SubscriptionService;
 import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.entity.UserSubscriptionEntity;
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +23,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProfileController {
 
+    @Qualifier("loggedUserService")
+    @NonNull
     UserService userService;
 
+
+    @Qualifier("loggedSubscriptionService")
+    @NonNull
     SubscriptionService subscriptionService;
 
     @GetMapping("{id}")

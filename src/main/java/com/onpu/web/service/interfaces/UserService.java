@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface UserService {
 
-    UserEntity findById(String name);
+    UserEntity findById(String id);
 
     List<UserEntity> getUsers(Optional<String> optionalPrefixName);
 
