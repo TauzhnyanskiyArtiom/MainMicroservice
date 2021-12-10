@@ -26,7 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MessageController {
 
-    @Qualifier("cashedMessageService")
+    @Qualifier("loggedMessageService")
     @NonNull
     MessageService messageService;
 

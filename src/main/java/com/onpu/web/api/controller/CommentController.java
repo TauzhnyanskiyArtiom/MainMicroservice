@@ -8,8 +8,10 @@ import com.onpu.web.store.entity.CommentEntity;
 import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.repository.UserRepository;
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +27,8 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class CommentController {
 
+    @Qualifier("loggedCommentService")
+    @NonNull
     CommentService commentService;
 
     @PostMapping

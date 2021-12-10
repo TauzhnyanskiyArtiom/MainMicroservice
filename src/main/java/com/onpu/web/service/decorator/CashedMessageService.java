@@ -28,6 +28,7 @@ public class CashedMessageService implements MessageService {
     @Qualifier("messageServiceImpl")
     MessageService messageService;
 
+    @Qualifier("loggedSubscriptionService")
     SubscriptionService subscriptionService;
 
     @NonFinal
