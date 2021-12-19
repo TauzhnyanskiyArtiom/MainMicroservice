@@ -33,8 +33,13 @@ export default {
   },
   watch: {
     messageAttr(newVal, oldVal) {
-      this.text = newVal.text
-      this.id = newVal.id
+      if (newVal === null){
+        this.text = ''
+        this.id = ''
+      } else {
+        this.text = newVal.text
+        this.id = newVal.id
+      }
     }
   },
   methods: {

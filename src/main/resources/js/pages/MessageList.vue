@@ -38,6 +38,7 @@
                         this.messages.splice(this.messages.indexOf(message), 1)
                     }
                 })
+                this.message = null
             }
         }
     }
