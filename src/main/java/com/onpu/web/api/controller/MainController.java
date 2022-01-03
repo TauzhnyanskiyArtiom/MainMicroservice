@@ -6,13 +6,11 @@ import com.onpu.web.service.interfaces.MessageService;
 import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
-import com.onpu.web.store.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,7 +19,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +33,9 @@ public class MainController {
     @Value("${spring.profiles.active:prod}")
     String profile;
 
-    @Qualifier("loggedUserService")
-    @NonNull
-    UserService userService;
+    UserService loggedUserService;
 
-    @Qualifier("loggedMessageService")
-    @NonNull
-    MessageService messageService;
+    MessageService loggedMessageService;
 
     @GetMapping
     public String index(@AuthenticationPrincipal OAuth2User oauthUser,
@@ -50,10 +43,10 @@ public class MainController {
         Map<Object, Object> data = new HashMap<>();
 
         if (oauthUser != null) {
-            UserEntity userEntity = userService.findById(oauthUser.getName());
+            UserEntity userEntity = loggedUserService.findById(oauthUser.getName());
 
             data.put("profile", userEntity);
-            List<MessageEntity> messages = messageService.findForUser(userEntity);
+            List<MessageEntity> messages = loggedMessageService.findForUser(userEntity);
             data.put("messages", messages);
         }
 

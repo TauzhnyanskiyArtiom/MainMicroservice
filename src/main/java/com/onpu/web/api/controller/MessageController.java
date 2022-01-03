@@ -26,9 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MessageController {
 
-    @Qualifier("loggedMessageService")
-    @NonNull
-    MessageService messageService;
+    MessageService loggedMessageService;
 
 
     @GetMapping
@@ -36,7 +34,7 @@ public class MessageController {
     public ResponseEntity<List<MessageEntity>> list(
             @RequestParam(value = "prefix_name", required = false) Optional<String> optionalPrefixName){
 
-        List<MessageEntity> messages = messageService.getListMessages(optionalPrefixName);
+        List<MessageEntity> messages = loggedMessageService.getListMessages(optionalPrefixName);
 
         return ResponseEntity.ok(messages);
 
@@ -58,7 +56,7 @@ public class MessageController {
             @AuthenticationPrincipal OAuth2User oauthUser){
 
         UserEntity user = oauthUser.getUser();
-        MessageEntity resultMessage = messageService.createMessage(message, user);
+        MessageEntity resultMessage = loggedMessageService.createMessage(message, user);
 
         return ResponseEntity.ok(resultMessage);
     }
@@ -69,14 +67,14 @@ public class MessageController {
             @PathVariable("message_id") MessageEntity messageFromDB,
             @RequestBody MessageEntity message){
 
-        MessageEntity resultMessage = messageService.updateMessage(messageFromDB, message);
+        MessageEntity resultMessage = loggedMessageService.updateMessage(messageFromDB, message);
         return ResponseEntity.ok(resultMessage);
     }
 
     @DeleteMapping("{message_id}")
     public void deleteMessage( @PathVariable("message_id") MessageEntity message) {
 
-        messageService.deleteMessage(message);
+        loggedMessageService.deleteMessage(message);
     }
 
 }

@@ -25,11 +25,9 @@ import java.util.stream.Collectors;
 @Service
 public class CashedMessageService implements MessageService {
 
-    @Qualifier("messageServiceImpl")
-    MessageService messageService;
+    MessageService messageServiceImpl;
 
-    @Qualifier("loggedSubscriptionService")
-    SubscriptionService subscriptionService;
+    SubscriptionService loggedSubscriptionService;
 
     @NonFinal
     HashMap<String, List<MessageEntity>> cashedMessage;
@@ -45,7 +43,7 @@ public class CashedMessageService implements MessageService {
         List<MessageEntity> messages = cashedMessage.get(userEntity.getId());
 
         if (Objects.isNull(messages)) {
-            messages  = messageService.findForUser(userEntity);
+            messages  = messageServiceImpl.findForUser(userEntity);
             cashedMessage.put(userEntity.getId(), messages);
 
         }
@@ -55,7 +53,7 @@ public class CashedMessageService implements MessageService {
 
     @Override
     public MessageEntity updateMessage(MessageEntity messageFromDB, MessageEntity message) {
-        MessageEntity updatedMessage = messageService.updateMessage(messageFromDB, message);
+        MessageEntity updatedMessage = messageServiceImpl.updateMessage(messageFromDB, message);
 
         List<UserEntity> subscribers = getAllSubscribers(updatedMessage.getAuthor());
 
@@ -81,12 +79,12 @@ public class CashedMessageService implements MessageService {
                 messages.remove(message);
         }
 
-        messageService.deleteMessage(message);
+        messageServiceImpl.deleteMessage(message);
     }
 
     @Override
     public MessageEntity createMessage(MessageEntity message, UserEntity user) {
-        MessageEntity savedMessage = messageService.createMessage(message, user);
+        MessageEntity savedMessage = messageServiceImpl.createMessage(message, user);
 
         List<UserEntity> subscribers = getAllSubscribers(user);
         subscribers.stream().forEach(u -> cashedMessage.remove(u.getId()));
@@ -96,11 +94,11 @@ public class CashedMessageService implements MessageService {
 
     @Override
     public List<MessageEntity> getListMessages(Optional<String> optionalPrefixName) {
-        return messageService.getListMessages(optionalPrefixName);
+        return messageServiceImpl.getListMessages(optionalPrefixName);
     }
 
     private List<UserEntity> getAllSubscribers(UserEntity user){
-        List<UserEntity> subscribers = subscriptionService
+        List<UserEntity> subscribers = loggedSubscriptionService
                 .getSubscribers(user)
                 .stream()
                 .map(subs -> subs.getSubscriber())

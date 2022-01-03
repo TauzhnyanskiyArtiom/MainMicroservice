@@ -6,7 +6,6 @@ import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.CommentService;
 import com.onpu.web.store.entity.CommentEntity;
 import com.onpu.web.store.entity.UserEntity;
-import com.onpu.web.store.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +26,7 @@ import javax.transaction.Transactional;
 @RequiredArgsConstructor
 public class CommentController {
 
-    @Qualifier("loggedCommentService")
-    @NonNull
-    CommentService commentService;
+    CommentService loggedCommentService;
 
     @PostMapping
     @JsonView(Views.FullComment.class)
@@ -38,6 +35,6 @@ public class CommentController {
             @AuthenticationPrincipal OAuth2User oauthUser
     ) {
         UserEntity user = oauthUser.getUser();
-        return commentService.create(comment, user);
+        return loggedCommentService.create(comment, user);
     }
 }

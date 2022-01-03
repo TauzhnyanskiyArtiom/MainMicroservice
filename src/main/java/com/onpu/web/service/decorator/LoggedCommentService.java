@@ -1,7 +1,6 @@
 package com.onpu.web.service.decorator;
 
 import com.onpu.web.service.interfaces.CommentService;
-import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.CommentEntity;
 import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
@@ -11,9 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -21,8 +17,7 @@ import java.util.Optional;
 @Service
 public class LoggedCommentService implements CommentService {
 
-    @Qualifier("commentServiceImpl")
-    CommentService commentService;
+    CommentService commentServiceImpl;
 
 
     @Override
@@ -33,6 +28,6 @@ public class LoggedCommentService implements CommentService {
         log.info("Message id: " + comment.getMessage().getId());
 
 
-        return commentService.create(comment, user);
+        return commentServiceImpl.create(comment, user);
     }
 }

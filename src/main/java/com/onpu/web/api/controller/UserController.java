@@ -24,16 +24,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserController {
 
-    @Qualifier("loggedUserService")
-    @NonNull
-    UserService userService;
+    UserService loggedUserService;
 
     @GetMapping("name")
     public List<UserEntity> getUsers(
             @RequestParam(value = "prefixName", required = false) Optional<String> optionalPrefixName,
             @AuthenticationPrincipal OAuth2User oauthUser
     ){
-        List<UserEntity> users = userService.getUsers(optionalPrefixName);
+        List<UserEntity> users = loggedUserService.getUsers(optionalPrefixName);
         users = users.stream()
                 .filter(user -> !user.equals(oauthUser.getUser()))
                 .collect(Collectors.toList());
@@ -42,7 +40,7 @@ public class UserController {
 
     @GetMapping
     public List<UserEntity> getAllUsers(@AuthenticationPrincipal OAuth2User oauthUser){
-        List<UserEntity> users = userService.getAllUsers();
+        List<UserEntity> users = loggedUserService.getAllUsers();
 
         users = users.stream()
                 .filter(user -> !user.equals(oauthUser.getUser()))

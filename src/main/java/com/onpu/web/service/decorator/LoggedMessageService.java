@@ -19,8 +19,7 @@ import java.util.Optional;
 @Service
 public class LoggedMessageService implements MessageService{
 
-    @Qualifier("cashedMessageService")
-    MessageService messageService;
+    MessageService cashedMessageService;
 
     @Override
     public List<MessageEntity> findForUser(UserEntity userEntity) {
@@ -28,7 +27,7 @@ public class LoggedMessageService implements MessageService{
         log.info("User id: " + userEntity.getId());
         log.info("User name: " + userEntity.getName());
 
-        return messageService.findForUser(userEntity);
+        return cashedMessageService.findForUser(userEntity);
     }
 
     @Override
@@ -36,7 +35,7 @@ public class LoggedMessageService implements MessageService{
         log.info("Message id: " + messageFromDB.getId());
         log.info("Message new text: " + message.getText());
 
-        return messageService.updateMessage(messageFromDB, message);
+        return cashedMessageService.updateMessage(messageFromDB, message);
 
     }
 
@@ -44,7 +43,7 @@ public class LoggedMessageService implements MessageService{
     public void deleteMessage(MessageEntity message) {
         log.info("Message id for delete:" + message.getId());
 
-        messageService.deleteMessage(message);
+        cashedMessageService.deleteMessage(message);
     }
 
     @Override
@@ -53,13 +52,13 @@ public class LoggedMessageService implements MessageService{
         log.info("User id: " + user.getId());
         log.info("Message text: " + message.getText());
 
-        return messageService.createMessage(message, user);
+        return cashedMessageService.createMessage(message, user);
     }
 
     @Override
     public List<MessageEntity> getListMessages(Optional<String> optionalPrefixName) {
         log.info("Search messages: " + optionalPrefixName.get());
 
-        return messageService.getListMessages(optionalPrefixName);
+        return cashedMessageService.getListMessages(optionalPrefixName);
     }
 }
