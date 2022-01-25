@@ -1,17 +1,15 @@
 package com.onpu.web.api.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.onpu.web.api.dto.EventType;
+import com.onpu.web.api.dto.ObjectType;
 import com.onpu.web.api.oauth2.OAuth2User;
+import com.onpu.web.api.util.WsSender;
 import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.CommentService;
 import com.onpu.web.store.entity.CommentEntity;
-import com.onpu.web.store.entity.UserEntity;
-import com.onpu.web.store.repository.UserRepository;
 import lombok.AccessLevel;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,25 +17,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 @RestController
 @Transactional
 @RequestMapping("/api/comments")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-@RequiredArgsConstructor
 public class CommentController {
 
-    @Qualifier("loggedCommentService")
-    @NonNull
-    CommentService commentService;
+    CommentService loggedCommentService;
+    BiConsumer<EventType, CommentEntity> wsSender;
+
+    public CommentController(CommentService loggedCommentService, WsSender wsSender) {
+        this.loggedCommentService = loggedCommentService;
+        this.wsSender = wsSender.getSender(ObjectType.COMMENT, Views.FullComment.class);
+    }
 
     @PostMapping
     @JsonView(Views.FullComment.class)
-    public CommentEntity createComment(
+    public CompletableFuture<CommentEntity> createComment(
             @RequestBody CommentEntity comment,
             @AuthenticationPrincipal OAuth2User oauthUser
     ) {
-        UserEntity user = oauthUser.getUser();
-        return commentService.create(comment, user);
+        return CompletableFuture.supplyAsync(oauthUser::getUser)
+                .thenApplyAsync((user) -> {
+                    CommentEntity createdComment = loggedCommentService.create(comment, user);
+                    wsSender.accept(EventType.CREATE, createdComment);
+                    return createdComment;
+                });
     }
 }

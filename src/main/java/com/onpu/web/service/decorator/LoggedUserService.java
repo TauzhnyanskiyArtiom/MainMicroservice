@@ -19,27 +19,26 @@ import java.util.Optional;
 @Service
 public class LoggedUserService implements UserService {
 
-    @Qualifier("userServiceImpl")
-    UserService userService;
+    UserService userServiceImpl;
 
     @Override
     public UserEntity findById(String id) {
 
         log.info("Find User by id: " + id);
 
-        return userService.findById(id);
+        return userServiceImpl.findById(id);
     }
 
     @Override
     public List<UserEntity> getUsers(Optional<String> optionalPrefixName) {
         log.info("Search users: " + optionalPrefixName.get());
 
-        return userService.getUsers(optionalPrefixName);
+        return userServiceImpl.getUsers(optionalPrefixName);
     }
 
     @Override
     public List<UserEntity> getAllUsers() {
         log.info("Search all users");
-        return userService.getAllUsers();
+        return userServiceImpl.getAllUsers();
     }
 }

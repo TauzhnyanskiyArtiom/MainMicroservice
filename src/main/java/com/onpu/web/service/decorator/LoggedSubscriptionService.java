@@ -19,8 +19,7 @@ import java.util.List;
 @Service
 public class LoggedSubscriptionService implements SubscriptionService {
 
-    @Qualifier("subscriptionServiceImpl")
-    SubscriptionService subscriptionService;
+    SubscriptionService subscriptionServiceImpl;
 
 
     @Override
@@ -29,7 +28,7 @@ public class LoggedSubscriptionService implements SubscriptionService {
         log.info("Channel id: " + channel.getId());
         log.info("Subscriber text: " + subscriber.getId());
 
-        return subscriptionService.changeSubscription(channel, subscriber);
+        return subscriptionServiceImpl.changeSubscription(channel, subscriber);
     }
 
     @Override
@@ -38,7 +37,7 @@ public class LoggedSubscriptionService implements SubscriptionService {
         log.info("Channel id: " + channel.getId());
         log.info("Channel name: " + channel.getName());
 
-        return subscriptionService.getSubscribers(channel);
+        return subscriptionServiceImpl.getSubscribers(channel);
     }
 
     @Override
@@ -47,6 +46,6 @@ public class LoggedSubscriptionService implements SubscriptionService {
         log.info("Channel id: " + channel.getId());
         log.info("Subscriber text: " + subscriber.getId());
 
-        return subscriptionService.changeSubscriptionStatus(channel, subscriber);
+        return subscriptionServiceImpl.changeSubscriptionStatus(channel, subscriber);
     }
 }

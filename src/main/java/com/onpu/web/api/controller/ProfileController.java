@@ -23,19 +23,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProfileController {
 
-    @Qualifier("loggedUserService")
-    @NonNull
-    UserService userService;
+    UserService loggedUserService;
 
-
-    @Qualifier("loggedSubscriptionService")
-    @NonNull
-    SubscriptionService subscriptionService;
+    SubscriptionService loggedSubscriptionService;
 
     @GetMapping("{id}")
     @JsonView(Views.FullProfile.class)
     public UserEntity getProfile(@PathVariable("id") String userId) {
-        UserEntity user = userService.findById(userId);
+        UserEntity user = loggedUserService.findById(userId);
         return user;
     }
 
@@ -45,12 +40,12 @@ public class ProfileController {
             @AuthenticationPrincipal OAuth2User oauthUser,
             @PathVariable("channelId") String channelId
     ) {
-        UserEntity channel = userService.findById(channelId);
+        UserEntity channel = loggedUserService.findById(channelId);
         UserEntity subscriber = oauthUser.getUser();
         if (subscriber.equals(channel)) {
             return channel;
         } else {
-            return subscriptionService.changeSubscription(channel, subscriber);
+            return loggedSubscriptionService.changeSubscription(channel, subscriber);
         }
     }
 
@@ -59,8 +54,8 @@ public class ProfileController {
     public List<UserSubscriptionEntity> subscribers(
             @PathVariable("channelId") String channelId
     ) {
-        UserEntity channel = userService.findById(channelId);
-        return subscriptionService.getSubscribers(channel);
+        UserEntity channel = loggedUserService.findById(channelId);
+        return loggedSubscriptionService.getSubscribers(channel);
     }
 
     @PostMapping("change-status/{subscriberId}")
@@ -70,8 +65,8 @@ public class ProfileController {
             @PathVariable("subscriberId") String subscriberId
     ) {
         UserEntity channel = oauthUser.getUser();
-        UserEntity subscriber = userService.findById(subscriberId);
-        return subscriptionService.changeSubscriptionStatus(channel, subscriber);
+        UserEntity subscriber = loggedUserService.findById(subscriberId);
+        return loggedSubscriptionService.changeSubscriptionStatus(channel, subscriber);
     }
 
 
