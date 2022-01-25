@@ -13,15 +13,8 @@
 </template>
 
 <script>
-function getIndex(list, id) {
-  for (var i = 0; i < list.length; i++) {
-    if (list[i].id === id) {
-      return i
-    }
-  }
 
-  return -1
-}
+import messagesApi from 'api/messages'
 
 export default {
   props: ['messages', 'messageAttr'],
@@ -44,24 +37,31 @@ export default {
   },
   methods: {
     save() {
-      const message = {text: this.text}
-
+      const message = {
+        id: this.id,
+        text: this.text
+      }
       if (this.id) {
-        this.$resource('/api/messages{/id}').update({id: this.id}, message)
-            .then(result => result.json())
-            .then(data => {
-              const index = getIndex(this.messages, data.id)
+        messagesApi.update(message).then(result =>
+            result.json().then(data => {
+              const index = this.messages.findIndex(item => item.id === data.id)
               this.messages.splice(index, 1, data)
               this.text = ''
               this.id = ''
             })
+        )
       } else {
-        this.$resource('/api/messages{/id}').save({}, message)
-            .then(result => result.json())
-            .then(data => {
+        messagesApi.add(message).then(result =>
+            result.json().then(data => {
+              const index = this.messages.findIndex(item => item.id === data.id)
+              if (index > -1) {
+                this.messages.splice(index, 1, data)
+              } else {
                 this.messages.push(data)
-                this.text = ''
+              }
             })
+        )
+        this.text = ''
       }
     }
   }

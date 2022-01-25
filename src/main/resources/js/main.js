@@ -1,12 +1,16 @@
-import Vue from "vue";
-import VueResource from 'vue-resource'
+import Vue from 'vue'
+import Vuetify from 'vuetify'
+import 'api/resource'
 import App from 'pages/App.vue'
 import router from 'router/router'
 import 'vuetify/dist/vuetify.min.css'
-import Vuetify from 'vuetify';
-Vue.use(Vuetify);
+import {connect} from './util/ws'
 
-Vue.use(VueResource)
+if (frontendData.profile) {
+    connect()
+}
+
+Vue.use(Vuetify)
 
 new Vue({
     el: '#app',
