@@ -11,6 +11,7 @@ import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+@Slf4j
 @RestController
 @Transactional
 @RequestMapping("/api/messages")
@@ -64,6 +66,11 @@ public class MessageController {
         return CompletableFuture
                 .supplyAsync(() -> {
                     MessageEntity createdMessage = loggedMessageService.createMessage(message, user);
+                    log.info("CREATED");
+                    return createdMessage;
+                })
+                .thenApplyAsync((createdMessage) -> {
+                    log.info("WEBSOCKET");
                     wsSender.accept(EventType.CREATE, createdMessage);
                     return createdMessage;
                 });
@@ -87,9 +94,10 @@ public class MessageController {
     public CompletableFuture<Void> deleteMessage( @PathVariable("message_id") MessageEntity message) {
         return CompletableFuture
                 .runAsync(() -> loggedMessageService.deleteMessage(message))
-                        .thenRunAsync(() -> wsSender.accept(EventType.REMOVE, message));
+                        .thenRunAsync(() -> {
+                            log.info("WsSender");
+                            wsSender.accept(EventType.REMOVE, message);
+                        });
     }
-
-
 
 }
