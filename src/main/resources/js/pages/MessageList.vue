@@ -36,7 +36,9 @@
             deleteMessage(message) {
                 messagesApi.remove(message.id).then(result => {
                     if (result.ok) {
-                        this.messages.splice(this.messages.indexOf(message), 1)
+                        const index = this.messages.findIndex(item => item.id === message.id)
+                        if (index > -1)
+                          this.messages.splice(index, 1)
                     }
                 })
                 this.message = null

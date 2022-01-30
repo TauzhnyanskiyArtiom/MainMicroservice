@@ -79,7 +79,8 @@ export default {
             }
             break
           case 'REMOVE':
-            this.messages.splice(index, 1)
+            if (index > -1)
+              this.messages.splice(index, 1)
             break
           default:
             console.error(`Looks like the event type if unknown "${data.eventType}"`)

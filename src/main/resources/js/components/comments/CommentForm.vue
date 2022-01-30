@@ -15,9 +15,12 @@
 </template>
 
 <script>
+
+import commentsApi from 'api/comments'
+
 export default {
   name: 'CommentForm',
-  props: ['messageId','comments'],
+  props: ['messageId', 'comments'],
   data() {
     return {
       text: ''
@@ -25,14 +28,17 @@ export default {
   },
   methods: {
     save() {
-      this.$resource('/api/comments').save({},{text: this.text, message: {id: this.messageId}})
+      commentsApi.add({text: this.text, message: {id: this.messageId}})
           .then(result =>
-          result.json().then(data => {
-            this.comments.push(data)
-            this.text = ''
-          })
-      )
-      }
+              result.json().then(data => {
+                const index = this.comments.findIndex(item => item.id === data.id)
+                if (index > -1)
+                  this.comments.splice(index, 1, data)
+                else
+                  this.comments.push(data)
+              }))
+      this.text = ''
+    }
   }
 }
 </script>
