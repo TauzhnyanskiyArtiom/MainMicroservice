@@ -90,8 +90,6 @@ export default {
         if (indMessage > -1) {
           const comments = this.messages[indMessage].comments
           const indComment = comments.findIndex(item => item.id === data.body.id)
-          console.log(indComment)
-          console.log(comments)
           if (indComment > -1) {
             comments.splice(indComment, 1, data.body)
           } else {
