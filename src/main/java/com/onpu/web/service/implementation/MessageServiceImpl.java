@@ -1,6 +1,10 @@
 package com.onpu.web.service.implementation;
 
+import com.onpu.web.api.dto.EventType;
 import com.onpu.web.api.dto.MetaDto;
+import com.onpu.web.api.dto.ObjectType;
+import com.onpu.web.api.util.WsSender;
+import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.MessageService;
 import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
@@ -8,7 +12,6 @@ import com.onpu.web.store.entity.UserSubscriptionEntity;
 import com.onpu.web.store.repository.MessageRepository;
 import com.onpu.web.store.repository.UserSubscriptionRepository;
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.jsoup.Jsoup;
@@ -22,11 +25,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -39,7 +42,16 @@ public class MessageServiceImpl implements MessageService {
 
     MessageRepository messageRepository;
 
+    BiConsumer<EventType, MessageEntity> wsSender;
+
     UserSubscriptionRepository userSubscriptionRepository;
+
+    public MessageServiceImpl(MessageRepository messageRepository, WsSender wsSender, UserSubscriptionRepository userSubscriptionRepository) {
+        this.messageRepository = messageRepository;
+        this.wsSender = wsSender.getSender(ObjectType.MESSAGE, Views.FullMessage.class);
+        this.userSubscriptionRepository = userSubscriptionRepository;
+    }
+
 
 
     @Override
@@ -61,15 +73,19 @@ public class MessageServiceImpl implements MessageService {
         BeanUtils.copyProperties(message, messageFromDB, "id", "comments","author");
 
         fillMeta(messageFromDB);
-
         messageFromDB.setCreationDate(LocalDateTime.now());
+
         messageRepository.saveAndFlush(messageFromDB);
+        wsSender.accept(EventType.UPDATE, messageFromDB);
+
         return messageFromDB;
     }
 
     @Override
     public void deleteMessage(MessageEntity message) {
+
         messageRepository.delete(message);
+        wsSender.accept(EventType.REMOVE, message);
     }
 
     @Override
@@ -79,7 +95,10 @@ public class MessageServiceImpl implements MessageService {
         message.setCreationDate(LocalDateTime.now());
         fillMeta(message);
 
-        return messageRepository.saveAndFlush(message);
+        MessageEntity createdMessage = messageRepository.saveAndFlush(message);
+        wsSender.accept(EventType.CREATE, createdMessage);
+
+        return createdMessage;
     }
 
     @Override

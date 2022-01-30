@@ -79,7 +79,8 @@ export default {
             }
             break
           case 'REMOVE':
-            this.messages.splice(index, 1)
+            if (index > -1)
+              this.messages.splice(index, 1)
             break
           default:
             console.error(`Looks like the event type if unknown "${data.eventType}"`)
@@ -89,6 +90,8 @@ export default {
         if (indMessage > -1) {
           const comments = this.messages[indMessage].comments
           const indComment = comments.findIndex(item => item.id === data.body.id)
+          console.log(indComment)
+          console.log(comments)
           if (indComment > -1) {
             comments.splice(indComment, 1, data.body)
           } else {
