@@ -5,11 +5,11 @@ import com.onpu.web.service.interfaces.MessageService;
 import com.onpu.web.service.interfaces.SubscriptionService;
 import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
+import com.onpu.web.store.entity.UserSubscriptionEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -87,7 +87,7 @@ public class CashedMessageService implements MessageService {
         MessageEntity savedMessage = messageServiceImpl.createMessage(message, user);
 
         List<UserEntity> subscribers = getAllSubscribers(user);
-        subscribers.stream().forEach(u -> cashedMessage.remove(u.getId()));
+        subscribers.stream().forEach(u -> cashedMessage.get(u.getId()).add(savedMessage));
 
         return savedMessage;
     }
@@ -101,7 +101,7 @@ public class CashedMessageService implements MessageService {
         List<UserEntity> subscribers = loggedSubscriptionService
                 .getSubscribers(user)
                 .stream()
-                .map(subs -> subs.getSubscriber())
+                .map(UserSubscriptionEntity::getSubscriber)
                 .collect(Collectors.toList());
 
         subscribers.add(user);

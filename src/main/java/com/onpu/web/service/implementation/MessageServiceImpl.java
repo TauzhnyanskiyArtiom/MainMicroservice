@@ -96,7 +96,6 @@ public class MessageServiceImpl implements MessageService {
         fillMeta(message);
 
         MessageEntity createdMessage = messageRepository.saveAndFlush(message);
-        wsSender.accept(EventType.CREATE, createdMessage);
 
         return createdMessage;
     }
