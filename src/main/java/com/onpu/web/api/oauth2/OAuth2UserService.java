@@ -1,7 +1,7 @@
 package com.onpu.web.api.oauth2;
 
+import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
-import com.onpu.web.store.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,29 +19,35 @@ import java.util.Map;
 @Service
 public class OAuth2UserService extends OidcUserService {
 
-    UserRepository userRepository;
+    UserService loggedUserService;
 
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
         OidcUser oidcUser = super.loadUser(userRequest);
+        UserEntity user = saveUser(oidcUser);
+        return new OAuth2User(oidcUser, user);
+    }
+
+
+    private UserEntity saveUser(OidcUser oidcUser){
+
         Map<String, Object> attributes = oidcUser.getAttributes();
         String id = (String) attributes.get("sub");
 
-        UserEntity user = userRepository.findById(id).orElseGet(() -> {
-            UserEntity newUser = UserEntity.builder()
+        UserEntity user = loggedUserService.findById(id).orElseGet(() ->
+                UserEntity.builder()
                     .id(id)
                     .name((String) attributes.get("name"))
                     .email((String) attributes.get("email"))
                     .locale((String) attributes.get("locale"))
                     .userpic((String) attributes.get("picture"))
-                    .build();
-            return newUser;
-        });
+                    .build());
 
         user.setLastVisit(LocalDateTime.now());
 
-        userRepository.saveAndFlush(user);
-        return new OAuth2User(oidcUser, user);
+        loggedUserService.create(user);
+
+        return user;
     }
 
 

@@ -7,7 +7,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.Optional;
 @Service
 public class LoggedMessageService implements MessageService{
 
-    MessageService cashedMessageService;
+    MessageService messageServiceImpl;
 
     @Override
     public List<MessageEntity> findForUser(UserEntity userEntity) {
@@ -27,7 +26,7 @@ public class LoggedMessageService implements MessageService{
         log.info("User id: " + userEntity.getId());
         log.info("User name: " + userEntity.getName());
 
-        return cashedMessageService.findForUser(userEntity);
+        return messageServiceImpl.findForUser(userEntity);
     }
 
     @Override
@@ -35,7 +34,7 @@ public class LoggedMessageService implements MessageService{
         log.info("Message id: " + messageFromDB.getId());
         log.info("Message new text: " + message.getText());
 
-        return cashedMessageService.updateMessage(messageFromDB, message);
+        return messageServiceImpl.updateMessage(messageFromDB, message);
 
     }
 
@@ -43,7 +42,7 @@ public class LoggedMessageService implements MessageService{
     public void deleteMessage(MessageEntity message) {
         log.info("Message id for delete:" + message.getId());
 
-        cashedMessageService.deleteMessage(message);
+        messageServiceImpl.deleteMessage(message);
     }
 
     @Override
@@ -52,13 +51,13 @@ public class LoggedMessageService implements MessageService{
         log.info("User id: " + user.getId());
         log.info("Message text: " + message.getText());
 
-        return cashedMessageService.createMessage(message, user);
+        return messageServiceImpl.createMessage(message, user);
     }
 
     @Override
     public List<MessageEntity> getListMessages(Optional<String> optionalPrefixName) {
         log.info("Search messages: " + optionalPrefixName.get());
 
-        return cashedMessageService.getListMessages(optionalPrefixName);
+        return messageServiceImpl.getListMessages(optionalPrefixName);
     }
 }

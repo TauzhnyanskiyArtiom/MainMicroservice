@@ -7,9 +7,11 @@ import java.util.Optional;
 
 public interface UserService {
 
-    UserEntity findById(String id);
-
-    List<UserEntity> getUsers(Optional<String> optionalPrefixName);
+    Optional<UserEntity> findById(String id);
 
     List<UserEntity> getAllUsers();
+
+    UserEntity create(UserEntity user);
+
+
 }

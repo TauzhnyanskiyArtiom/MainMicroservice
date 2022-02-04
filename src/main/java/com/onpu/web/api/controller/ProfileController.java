@@ -30,7 +30,7 @@ public class ProfileController {
     @GetMapping("{id}")
     @JsonView(Views.FullProfile.class)
     public UserEntity getProfile(@PathVariable("id") String userId) {
-        UserEntity user = loggedUserService.findById(userId);
+        UserEntity user = loggedUserService.findById(userId).get();
         return user;
     }
 
@@ -40,7 +40,7 @@ public class ProfileController {
             @AuthenticationPrincipal OAuth2User oauthUser,
             @PathVariable("channelId") String channelId
     ) {
-        UserEntity channel = loggedUserService.findById(channelId);
+        UserEntity channel = loggedUserService.findById(channelId).get();
         UserEntity subscriber = oauthUser.getUser();
         if (subscriber.equals(channel)) {
             return channel;
@@ -54,7 +54,7 @@ public class ProfileController {
     public List<UserSubscriptionEntity> subscribers(
             @PathVariable("channelId") String channelId
     ) {
-        UserEntity channel = loggedUserService.findById(channelId);
+        UserEntity channel = loggedUserService.findById(channelId).get();
         return loggedSubscriptionService.getSubscribers(channel);
     }
 
@@ -65,7 +65,7 @@ public class ProfileController {
             @PathVariable("subscriberId") String subscriberId
     ) {
         UserEntity channel = oauthUser.getUser();
-        UserEntity subscriber = loggedUserService.findById(subscriberId);
+        UserEntity subscriber = loggedUserService.findById(subscriberId).get();
         return loggedSubscriptionService.changeSubscriptionStatus(channel, subscriber);
     }
 
