@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
@@ -19,12 +20,17 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserEntity findById(String id) {
-        return userRepository.findById(id).get();
+    public Optional<UserEntity> findById(String id) {
+        return userRepository.findById(id);
     }
 
     @Override
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public UserEntity create(UserEntity user) {
+        return userRepository.saveAndFlush(user);
     }
 }
