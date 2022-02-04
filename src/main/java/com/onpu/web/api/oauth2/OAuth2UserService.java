@@ -2,7 +2,6 @@ package com.onpu.web.api.oauth2;
 
 import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
-import com.onpu.web.store.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -35,22 +34,20 @@ public class OAuth2UserService extends OidcUserService {
         Map<String, Object> attributes = oidcUser.getAttributes();
         String id = (String) attributes.get("sub");
 
-        UserEntity user = loggedUserService.findById(id).orElseGet(() -> {
-            UserEntity newUser = UserEntity.builder()
+        UserEntity user = loggedUserService.findById(id).orElseGet(() ->
+                UserEntity.builder()
                     .id(id)
                     .name((String) attributes.get("name"))
                     .email((String) attributes.get("email"))
                     .locale((String) attributes.get("locale"))
                     .userpic((String) attributes.get("picture"))
-                    .build();
-            return newUser;
-        });
+                    .build());
 
         user.setLastVisit(LocalDateTime.now());
 
-        UserEntity savedUser = loggedUserService.create(user);
+        loggedUserService.create(user);
 
-        return savedUser;
+        return user;
     }
 
 

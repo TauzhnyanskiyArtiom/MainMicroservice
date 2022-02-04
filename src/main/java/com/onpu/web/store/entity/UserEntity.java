@@ -21,6 +21,7 @@ import java.util.Set;
 @Entity
 @Table(name = "usr")
 public class UserEntity implements Serializable {
+
     @Id
     @JsonView(Views.IdName.class)
     String id;
@@ -48,8 +49,10 @@ public class UserEntity implements Serializable {
     @JsonView(Views.FullProfile.class)
     @OneToMany(
             mappedBy = "channel",
-            orphanRemoval = true,
-            cascade = CascadeType.ALL
+            orphanRemoval = true
     )
     private Set<UserSubscriptionEntity> subscribers = new HashSet<>();
+
+
+
 }
