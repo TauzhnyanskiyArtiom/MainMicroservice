@@ -30,13 +30,6 @@ public class LoggedUserService implements UserService {
     }
 
     @Override
-    public List<UserEntity> getUsers(Optional<String> optionalPrefixName) {
-        log.info("Search users: " + optionalPrefixName.get());
-
-        return userServiceImpl.getUsers(optionalPrefixName);
-    }
-
-    @Override
     public List<UserEntity> getAllUsers() {
         log.info("Search all users");
         return userServiceImpl.getAllUsers();
