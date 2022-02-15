@@ -103,11 +103,9 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<MessageEntity> getListMessages(Optional<String> optionalPrefixName) {
         optionalPrefixName = optionalPrefixName.filter(prefixName -> !prefixName.trim().isEmpty());
-        List<MessageEntity> messages = optionalPrefixName
+        return optionalPrefixName
                 .map(messageRepository::findAllByTextContainingIgnoreCase)
                 .orElseGet(() -> messageRepository.findAll());
-
-        return messages;
     }
 
     @SneakyThrows

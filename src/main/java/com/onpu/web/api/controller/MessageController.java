@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,12 +30,11 @@ public class MessageController {
 
     @GetMapping
     @JsonView(Views.FullMessage.class)
-    public CompletableFuture<List<MessageEntity>> list(
+    public List<MessageEntity> list(
             @RequestParam(value = "prefix_name", required = false) Optional<String> optionalPrefixName){
 
 
-        return CompletableFuture
-                .supplyAsync(() -> loggedMessageService.getListMessages(optionalPrefixName));
+        return loggedMessageService.getListMessages(optionalPrefixName);
     }
 
     @GetMapping("{message_id}")
@@ -50,31 +48,27 @@ public class MessageController {
 
     @PostMapping
     @JsonView(Views.FullMessage.class)
-    public CompletableFuture<MessageEntity> addMessage(
+    public MessageEntity addMessage(
             @RequestBody MessageEntity message,
             @AuthenticationPrincipal OAuth2User oauthUser){
 
         UserEntity user = oauthUser.getUser();
 
-        return CompletableFuture
-                .supplyAsync(() -> loggedMessageService.createMessage(message, user));
+        return loggedMessageService.createMessage(message, user);
     }
 
     @PutMapping("{message_id}")
     @JsonView(Views.FullMessage.class)
-    public CompletableFuture<MessageEntity> updateMessage(
+    public MessageEntity updateMessage(
             @PathVariable("message_id") MessageEntity messageFromDB,
             @RequestBody MessageEntity message){
 
-        return CompletableFuture
-                .supplyAsync(() -> loggedMessageService.updateMessage(messageFromDB, message)
-                );
+        return loggedMessageService.updateMessage(messageFromDB, message);
     }
 
     @DeleteMapping("{message_id}")
-    public CompletableFuture<Void> deleteMessage( @PathVariable("message_id") MessageEntity message) {
-        return CompletableFuture
-                .runAsync(() -> loggedMessageService.deleteMessage(message));
+    public void deleteMessage( @PathVariable("message_id") MessageEntity message) {
+        loggedMessageService.deleteMessage(message);
     }
 
 }
