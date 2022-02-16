@@ -7,8 +7,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.CompletableFuture;
 
 
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class LoggedCommentService implements CommentService {
 
 
     @Override
-    public CommentEntity create(CommentEntity comment, UserEntity user) {
+    public CompletableFuture<CommentEntity> create(CommentEntity comment, UserEntity user) {
         log.info("Create comment: ");
         log.info("User id: " + user.getId());
         log.info("Comment text: " + comment.getText());

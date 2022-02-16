@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequiredArgsConstructor
-@Transactional
 @RequestMapping("/api/comments")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CommentController {
@@ -28,7 +28,7 @@ public class CommentController {
 
     @PostMapping
     @JsonView(Views.FullComment.class)
-    public CommentEntity createComment(
+    public CompletableFuture<CommentEntity> createComment(
             @RequestBody CommentEntity comment,
             @AuthenticationPrincipal OAuth2User oauthUser
     ) {

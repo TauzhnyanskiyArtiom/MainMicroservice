@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -30,23 +31,24 @@ public class LoggedMessageService implements MessageService{
     }
 
     @Override
-    public MessageEntity updateMessage(MessageEntity messageFromDB, MessageEntity message) {
-        log.info("Message id: " + messageFromDB.getId());
+    public CompletableFuture<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
+        log.info("Message id: " + messageId);
         log.info("Message new text: " + message.getText());
 
-        return messageServiceImpl.updateMessage(messageFromDB, message);
+        return messageServiceImpl.updateMessage(messageId, message);
 
     }
 
     @Override
-    public void deleteMessage(MessageEntity message) {
-        log.info("Message id for delete:" + message.getId());
+    public CompletableFuture<Void> deleteMessage(Long messageId) {
+        log.info("Message id for delete:" + messageId);
 
-        messageServiceImpl.deleteMessage(message);
+        messageServiceImpl.deleteMessage(messageId);
+        return null;
     }
 
     @Override
-    public MessageEntity createMessage(MessageEntity message, UserEntity user) {
+    public CompletableFuture<MessageEntity> createMessage(MessageEntity message, UserEntity user) {
         log.info("Create message: ");
         log.info("User id: " + user.getId());
         log.info("Message text: " + message.getText());
