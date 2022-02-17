@@ -10,8 +10,10 @@ import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.repository.CommentRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -27,11 +29,16 @@ public class CommentServiceImpl implements CommentService {
         this.wsSender = wsSender.getSender(ObjectType.COMMENT, Views.FullComment.class);
     }
 
+    @Async
     @Override
-    public CommentEntity create(CommentEntity comment, UserEntity user) {
-        comment.setAuthor(user);
-        CommentEntity createdComment = commentRepository.saveAndFlush(comment);
-        wsSender.accept(EventType.CREATE, createdComment);
-        return createdComment;
+    public CompletableFuture<CommentEntity> create(CommentEntity comment, UserEntity user) {
+        final CompletableFuture<CommentEntity> completableFutureComment = CompletableFuture.supplyAsync(() -> {
+            comment.setAuthor(user);
+            return commentRepository.saveAndFlush(comment);
+        }).thenApplyAsync((resultComment) -> {
+            wsSender.accept(EventType.CREATE, resultComment);
+            return resultComment;
+        });
+        return completableFutureComment;
     }
 }

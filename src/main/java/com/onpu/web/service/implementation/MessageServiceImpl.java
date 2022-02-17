@@ -1,58 +1,50 @@
 package com.onpu.web.service.implementation;
 
 import com.onpu.web.api.dto.EventType;
-import com.onpu.web.api.dto.MetaDto;
 import com.onpu.web.api.dto.ObjectType;
+import com.onpu.web.api.exception.NotFoundException;
 import com.onpu.web.api.util.WsSender;
 import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.MessageService;
+import com.onpu.web.service.interfaces.MetaContentService;
 import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.entity.UserSubscriptionEntity;
 import com.onpu.web.store.repository.MessageRepository;
 import com.onpu.web.store.repository.UserSubscriptionRepository;
 import lombok.AccessLevel;
-import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Transactional
 @Service
 public class MessageServiceImpl implements MessageService {
 
-    static final String URL_PATTERN = "https?:\\/\\/?[\\w\\d\\._\\-%\\/\\?=&#]+";
-    static final String IMAGE_PATTERN = "\\.(jpeg|jpg|gif|png)$";
-
-    static Pattern URL_REGEX = Pattern.compile(URL_PATTERN, Pattern.CASE_INSENSITIVE);
-    static Pattern IMG_REGEX = Pattern.compile(IMAGE_PATTERN, Pattern.CASE_INSENSITIVE);
-
     MessageRepository messageRepository;
+
+    MetaContentService metaService;
 
     BiConsumer<EventType, MessageEntity> wsSender;
 
     UserSubscriptionRepository userSubscriptionRepository;
 
-    public MessageServiceImpl(MessageRepository messageRepository, WsSender wsSender, UserSubscriptionRepository userSubscriptionRepository) {
+    public MessageServiceImpl(MessageRepository messageRepository, MetaContentService metaService, WsSender wsSender, UserSubscriptionRepository userSubscriptionRepository) {
         this.messageRepository = messageRepository;
+        this.metaService = metaService;
         this.wsSender = wsSender.getSender(ObjectType.MESSAGE, Views.FullMessage.class);
         this.userSubscriptionRepository = userSubscriptionRepository;
     }
-
-
 
     @Override
     public List<MessageEntity> findForUser(UserEntity userEntity) {
@@ -67,88 +59,70 @@ public class MessageServiceImpl implements MessageService {
         return messageRepository.findByAuthorIn(channels);
     }
 
+    @Async
     @Override
-    public MessageEntity updateMessage(MessageEntity messageFromDB, MessageEntity message) {
+    public CompletableFuture<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
 
-        BeanUtils.copyProperties(message, messageFromDB, "id", "comments","author");
+        CompletableFuture<MessageEntity> completableFutureMessage = CompletableFuture.supplyAsync(() -> {
+            MessageEntity messageFromDb = getMessageEntity(messageId);
+            BeanUtils.copyProperties(message, messageFromDb, "id", "comments","author");
+            return messageFromDb;
 
-        fillMeta(messageFromDB);
-        messageFromDB.setCreationDate(LocalDateTime.now());
+        }).thenApplyAsync((resultMessage) -> {
+            metaService.fillMeta(resultMessage);
+            resultMessage.setCreationDate(LocalDateTime.now());
+            return resultMessage;
+        }).thenApplyAsync((resultMessage) -> messageRepository.saveAndFlush(resultMessage)
+        ).thenApplyAsync((resultMessage) -> {
+            wsSender.accept(EventType.UPDATE, resultMessage);
+            return resultMessage;
+        });
 
-        messageRepository.saveAndFlush(messageFromDB);
-        wsSender.accept(EventType.UPDATE, messageFromDB);
 
-        return messageFromDB;
+        return completableFutureMessage;
     }
 
-    @Override
-    public void deleteMessage(MessageEntity message) {
 
-        messageRepository.delete(message);
-        wsSender.accept(EventType.REMOVE, message);
+    @Async
+    @Override
+    public CompletableFuture<Void> deleteMessage(Long messageId) {
+        CompletableFuture<Void> completableFuture = CompletableFuture.supplyAsync(() -> {
+            MessageEntity message = getMessageEntity(messageId);
+            messageRepository.delete(message);
+            return message;
+        }).thenAcceptAsync((resultMessage) -> wsSender.accept(EventType.REMOVE, resultMessage));
+
+        return completableFuture;
+
     }
 
+    @Async
     @Override
-    public MessageEntity createMessage(MessageEntity message, UserEntity user)  {
+    public CompletableFuture<MessageEntity> createMessage(MessageEntity message, UserEntity user)  {
 
-        message.setAuthor(user);
-        message.setCreationDate(LocalDateTime.now());
-        fillMeta(message);
+        CompletableFuture<MessageEntity> completableFutureMessage = CompletableFuture.supplyAsync(() -> {
+            message.setAuthor(user);
+            message.setCreationDate(LocalDateTime.now());
+            return message;
+        }).thenApplyAsync((resultMessage) -> {
+            metaService.fillMeta(resultMessage);
+            return resultMessage;
+        }).thenApplyAsync(resultMessage -> messageRepository.saveAndFlush(resultMessage));
 
-        MessageEntity createdMessage = messageRepository.saveAndFlush(message);
-
-        return createdMessage;
+        return completableFutureMessage;
     }
 
     @Override
     public List<MessageEntity> getListMessages(Optional<String> optionalPrefixName) {
         optionalPrefixName = optionalPrefixName.filter(prefixName -> !prefixName.trim().isEmpty());
-        List<MessageEntity> messages = optionalPrefixName
+        return optionalPrefixName
                 .map(messageRepository::findAllByTextContainingIgnoreCase)
                 .orElseGet(() -> messageRepository.findAll());
-
-        return messages;
     }
 
-    @SneakyThrows
-    private void fillMeta(MessageEntity message) {
-        String text = message.getText();
-        Matcher matcher = URL_REGEX.matcher(text);
-
-        if (matcher.find()) {
-            String url = text.substring(matcher.start(), matcher.end());
-
-            matcher = IMG_REGEX.matcher(url);
-
-            message.setLink(url);
-
-            if (matcher.find()) {
-                message.setLinkCover(url);
-            } else if (!url.contains("youtu")) {
-                MetaDto meta = getMeta(url);
-
-                message.setLinkCover(meta.getCover());
-                message.setLinkTitle(meta.getTitle());
-                message.setLinkDescription(meta.getDescription());
-            }
-        }
+    private MessageEntity getMessageEntity(Long messageId) {
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("Message don`t found"));
     }
 
-    private MetaDto getMeta(String url) throws IOException {
-        Document doc = Jsoup.connect(url).get();
-
-        Elements title = doc.select("meta[name$=title],meta[property$=title]");
-        Elements description = doc.select("meta[name$=description],meta[property$=description]");
-        Elements cover = doc.select("meta[name$=image],meta[property$=image]");
-
-        return new MetaDto(
-                getContent(title.first()),
-                getContent(description.first()),
-                getContent(cover.first())
-        );
-    }
-
-    private String getContent(Element element) {
-        return element == null ? "" : element.attr("content");
-    }
 }

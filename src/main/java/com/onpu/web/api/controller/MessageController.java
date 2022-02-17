@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -21,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@Transactional
 @RequestMapping("/api/messages")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class MessageController {
@@ -31,12 +29,10 @@ public class MessageController {
 
     @GetMapping
     @JsonView(Views.FullMessage.class)
-    public CompletableFuture<List<MessageEntity>> list(
+    public List<MessageEntity> list(
             @RequestParam(value = "prefix_name", required = false) Optional<String> optionalPrefixName){
 
-
-        return CompletableFuture
-                .supplyAsync(() -> loggedMessageService.getListMessages(optionalPrefixName));
+        return loggedMessageService.getListMessages(optionalPrefixName);
     }
 
     @GetMapping("{message_id}")
@@ -56,25 +52,22 @@ public class MessageController {
 
         UserEntity user = oauthUser.getUser();
 
-        return CompletableFuture
-                .supplyAsync(() -> loggedMessageService.createMessage(message, user));
+        return loggedMessageService.createMessage(message, user);
     }
 
     @PutMapping("{message_id}")
     @JsonView(Views.FullMessage.class)
     public CompletableFuture<MessageEntity> updateMessage(
-            @PathVariable("message_id") MessageEntity messageFromDB,
+            @PathVariable("message_id") Long messageId,
             @RequestBody MessageEntity message){
 
-        return CompletableFuture
-                .supplyAsync(() -> loggedMessageService.updateMessage(messageFromDB, message)
-                );
+
+        return loggedMessageService.updateMessage(messageId, message);
     }
 
     @DeleteMapping("{message_id}")
-    public CompletableFuture<Void> deleteMessage( @PathVariable("message_id") MessageEntity message) {
-        return CompletableFuture
-                .runAsync(() -> loggedMessageService.deleteMessage(message));
+    public void deleteMessage( @PathVariable("message_id") Long messageId) {
+        loggedMessageService.deleteMessage(messageId);
     }
 
 }
