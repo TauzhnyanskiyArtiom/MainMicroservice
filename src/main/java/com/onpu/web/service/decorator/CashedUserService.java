@@ -48,4 +48,16 @@ public class CashedUserService implements UserService {
         cashedUsers.put(user.getId(), user);
         return user;
     }
+
+
+    public UserEntity saveSubscription(UserEntity channel, UserEntity subscriber) {
+        if (cashedUsers.containsKey(subscriber.getId())){
+            cashedUsers.remove(subscriber.getId());
+        }
+
+        UserEntity savedChannel = userServiceImpl.create(channel);
+
+        cashedUsers.put(savedChannel.getId(), savedChannel);
+        return savedChannel;
+    }
 }
