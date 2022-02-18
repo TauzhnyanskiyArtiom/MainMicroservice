@@ -18,25 +18,25 @@ import java.util.Optional;
 @Service
 public class LoggedUserService implements UserService {
 
-    UserService cashedUserService;
+    UserService userServiceImpl;
 
     @Override
     public Optional<UserEntity> findById(String id) {
 
         log.info("Find User by id: " + id);
 
-        return cashedUserService.findById(id);
+        return userServiceImpl.findById(id);
     }
 
     @Override
     public List<UserEntity> getAllUsers() {
         log.info("Search all users");
-        return cashedUserService.getAllUsers();
+        return userServiceImpl.getAllUsers();
     }
 
     @Override
     public UserEntity create(UserEntity user) {
         log.info("Save user: " + user.getName() + " id : " + user.getId());
-        return cashedUserService.create(user);
+        return userServiceImpl.create(user);
     }
 }
