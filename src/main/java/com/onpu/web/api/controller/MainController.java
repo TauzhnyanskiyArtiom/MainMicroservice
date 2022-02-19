@@ -37,7 +37,7 @@ public class MainController {
         Map<Object, Object> data = new HashMap<>();
 
         if (oauthUser != null) {
-            UserEntity userEntity = loggedUserService.findById(oauthUser.getName()).get();
+            UserEntity userEntity = loggedUserService.getById(oauthUser.getName());
 
             data.put("profile", userEntity);
         }

@@ -9,6 +9,8 @@ public interface UserService {
 
     Optional<UserEntity> findById(String id);
 
+    UserEntity getById(String id);
+
     List<UserEntity> getAllUsers();
 
     UserEntity create(UserEntity user);

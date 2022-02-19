@@ -29,6 +29,13 @@ public class LoggedUserService implements UserService {
     }
 
     @Override
+    public UserEntity getById(String id) {
+        log.info("Find User by id: " + id);
+
+        return cashedUserService.getById(id);
+    }
+
+    @Override
     public List<UserEntity> getAllUsers() {
         log.info("Search all users");
         return cashedUserService.getAllUsers();

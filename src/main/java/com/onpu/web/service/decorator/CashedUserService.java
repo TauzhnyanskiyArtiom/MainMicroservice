@@ -33,6 +33,18 @@ public class CashedUserService implements UserService {
 
         user.ifPresent( u -> cashedUsers.put(u.getId(), u));
 
+        return user;
+    }
+
+    @Override
+    public UserEntity getById(String id) {
+        if (cashedUsers.containsKey(id)) {
+            return cashedUsers.get(id);
+        }
+
+        UserEntity user = userServiceImpl.getById(id);
+
+        cashedUsers.put(user.getId(), user);
 
         return user;
     }
