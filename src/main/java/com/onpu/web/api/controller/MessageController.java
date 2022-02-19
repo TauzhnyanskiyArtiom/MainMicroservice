@@ -14,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -29,10 +28,10 @@ public class MessageController {
 
     @GetMapping
     @JsonView(Views.FullMessage.class)
-    public List<MessageEntity> list(
-            @RequestParam(value = "prefix_name", required = false) Optional<String> optionalPrefixName){
+    public List<MessageEntity> findForUser(
+            @AuthenticationPrincipal OAuth2User oauthUser){
 
-        return loggedMessageService.getListMessages(optionalPrefixName);
+        return loggedMessageService.findForUser(oauthUser.getUser());
     }
 
     @GetMapping("{message_id}")

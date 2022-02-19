@@ -39,4 +39,5 @@ public class LoggedUserService implements UserService {
         log.info("Save user: " + user.getName() + " id : " + user.getId());
         return cashedUserService.create(user);
     }
+
 }

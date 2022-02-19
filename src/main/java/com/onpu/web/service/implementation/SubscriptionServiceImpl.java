@@ -1,9 +1,9 @@
 package com.onpu.web.service.implementation;
 
+import com.onpu.web.service.decorator.CashedUserService;
 import com.onpu.web.service.interfaces.SubscriptionService;
 import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.entity.UserSubscriptionEntity;
-import com.onpu.web.store.repository.UserRepository;
 import com.onpu.web.store.repository.UserSubscriptionRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
 
-    UserRepository userRepository;
+    CashedUserService userService;
 
     UserSubscriptionRepository userSubscriptionRepository;
 
@@ -39,7 +39,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             channel.getSubscribers().removeAll(subscriptions);
         }
 
-        return userRepository.save(channel);
+        return userService.saveSubscription(channel, subscriber);
     }
 
     @Override
