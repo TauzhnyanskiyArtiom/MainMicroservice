@@ -9,6 +9,7 @@ import lombok.experimental.NonFinal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +26,7 @@ public class CashedUserService implements UserService {
 
     @Override
     public Optional<UserEntity> findById(String id) {
+
         if (cashedUsers.containsKey(id)) {
             return Optional.of(cashedUsers.get(id));
         }
@@ -38,15 +40,10 @@ public class CashedUserService implements UserService {
 
     @Override
     public UserEntity getById(String id) {
-        if (cashedUsers.containsKey(id)) {
-            return cashedUsers.get(id);
-        }
 
-        UserEntity user = userServiceImpl.getById(id);
-
-        cashedUsers.put(user.getId(), user);
-
-        return user;
+        return cashedUsers.compute(id, (k, v) ->
+                Objects.isNull(v) ? userServiceImpl.getById(id): v
+        );
     }
 
     @Override
