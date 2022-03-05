@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
 
     @Override
-    @EntityGraph(attributePaths = { "comments" })
+    @EntityGraph(attributePaths = { "comments", "author"})
     Optional<MessageEntity> findById(Long aLong);
 
     List<MessageEntity> findAllByTextContainingIgnoreCase(String prefixName);

@@ -60,17 +60,17 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Async
+    @Transactional
     @Override
     public CompletableFuture<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
 
         CompletableFuture<MessageEntity> completableFutureMessage = CompletableFuture.supplyAsync(() -> {
             MessageEntity messageFromDb = getMessageEntity(messageId);
-            BeanUtils.copyProperties(message, messageFromDb, "id", "comments","author");
+            BeanUtils.copyProperties(message, messageFromDb, "id", "comments","author", "createdAt", "modifiedAt");
             return messageFromDb;
 
         }).thenApplyAsync((resultMessage) -> {
             metaService.fillMeta(resultMessage);
-            resultMessage.setCreationDate(LocalDateTime.now());
             return resultMessage;
         }).thenApplyAsync((resultMessage) -> messageRepository.saveAndFlush(resultMessage)
         ).thenApplyAsync((resultMessage) -> {
@@ -102,12 +102,11 @@ public class MessageServiceImpl implements MessageService {
 
         CompletableFuture<MessageEntity> completableFutureMessage = CompletableFuture.supplyAsync(() -> {
             message.setAuthor(user);
-            message.setCreationDate(LocalDateTime.now());
             return message;
         }).thenApplyAsync((resultMessage) -> {
             metaService.fillMeta(resultMessage);
             return resultMessage;
-        }).thenApplyAsync(resultMessage -> messageRepository.saveAndFlush(resultMessage));
+        }).thenApplyAsync(resultMessage -> messageRepository.save(resultMessage));
 
         return completableFutureMessage;
     }

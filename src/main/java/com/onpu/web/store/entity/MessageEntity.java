@@ -18,18 +18,15 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "message")
 @Entity
-public class MessageEntity {
+public class MessageEntity extends AuditingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(Views.IdName.class)
     Long id;
 
     @JsonView(Views.IdName.class)
     String text;
-
-    @Column(updatable = false)
-    LocalDateTime creationDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

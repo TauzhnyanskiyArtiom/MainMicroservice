@@ -18,10 +18,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Table(name = "comment")
 @Entity
-public class CommentEntity {
+public class CommentEntity extends AuditingEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(Views.IdName.class)
     Long id;
 
