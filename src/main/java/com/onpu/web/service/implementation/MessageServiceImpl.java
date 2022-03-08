@@ -16,13 +16,12 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -59,56 +58,36 @@ public class MessageServiceImpl implements MessageService {
         return messageRepository.findByAuthorIn(channels);
     }
 
-    @Async
-    @Transactional
+
     @Override
-    public CompletableFuture<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
+    public MessageEntity updateMessage(Long messageId, MessageEntity message) {
 
-        CompletableFuture<MessageEntity> completableFutureMessage = CompletableFuture.supplyAsync(() -> {
-            MessageEntity messageFromDb = getMessageEntity(messageId);
-            BeanUtils.copyProperties(message, messageFromDb, "id", "comments","author", "createdAt", "modifiedAt");
-            return messageFromDb;
-
-        }).thenApplyAsync((resultMessage) -> {
-            metaService.fillMeta(resultMessage);
-            return resultMessage;
-        }).thenApplyAsync((resultMessage) -> messageRepository.saveAndFlush(resultMessage)
-        ).thenApplyAsync((resultMessage) -> {
-            wsSender.accept(EventType.UPDATE, resultMessage);
-            return resultMessage;
-        });
+        MessageEntity messageFromDb = getMessageEntity(messageId);
+        BeanUtils.copyProperties(message, messageFromDb, "id", "comments","author", "createdAt", "modifiedAt");
+        metaService.fillMeta(messageFromDb);
+        messageRepository.flush();
+        wsSender.accept(EventType.UPDATE, messageFromDb);
 
 
-        return completableFutureMessage;
+        return messageFromDb;
     }
 
 
-    @Async
     @Override
-    public CompletableFuture<Void> deleteMessage(Long messageId) {
-        CompletableFuture<Void> completableFuture = CompletableFuture.supplyAsync(() -> {
-            MessageEntity message = getMessageEntity(messageId);
-            messageRepository.delete(message);
-            return message;
-        }).thenAcceptAsync((resultMessage) -> wsSender.accept(EventType.REMOVE, resultMessage));
-
-        return completableFuture;
+    public void deleteMessage(Long messageId) {
+        MessageEntity message = getMessageEntity(messageId);
+        messageRepository.delete(message);
+        wsSender.accept(EventType.REMOVE, message);
 
     }
 
-    @Async
     @Override
-    public CompletableFuture<MessageEntity> createMessage(MessageEntity message, UserEntity user)  {
+    public MessageEntity createMessage(MessageEntity message, UserEntity user)  {
+        message.setAuthor(user);
+        metaService.fillMeta(message);
+        MessageEntity savedMessage = messageRepository.save(message);
 
-        CompletableFuture<MessageEntity> completableFutureMessage = CompletableFuture.supplyAsync(() -> {
-            message.setAuthor(user);
-            return message;
-        }).thenApplyAsync((resultMessage) -> {
-            metaService.fillMeta(resultMessage);
-            return resultMessage;
-        }).thenApplyAsync(resultMessage -> messageRepository.save(resultMessage));
-
-        return completableFutureMessage;
+        return savedMessage;
     }
 
     @Override

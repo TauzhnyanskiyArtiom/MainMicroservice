@@ -1,26 +1,24 @@
 package com.onpu.web.store.entity;
 
+import com.onpu.web.store.listener.UserRevisionListener;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.envers.RevisionEntity;
 import org.hibernate.envers.RevisionNumber;
 import org.hibernate.envers.RevisionTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@RevisionEntity
+@org.hibernate.envers.RevisionEntity(UserRevisionListener.class)
 @Entity
-public class Revision {
+@Table(name = "revision")
+public class RevisionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +28,9 @@ public class Revision {
     @RevisionTimestamp
     Long timestamp;
 
+    String userId;
+
+    String username;
 
 
 

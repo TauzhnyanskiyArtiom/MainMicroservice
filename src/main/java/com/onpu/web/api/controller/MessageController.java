@@ -14,7 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,7 +44,7 @@ public class MessageController {
 
     @PostMapping
     @JsonView(Views.FullMessage.class)
-    public CompletableFuture<MessageEntity> addMessage(
+    public MessageEntity addMessage(
             @RequestBody MessageEntity message,
             @AuthenticationPrincipal OAuth2User oauthUser){
 
@@ -56,7 +55,7 @@ public class MessageController {
 
     @PutMapping("{message_id}")
     @JsonView(Views.FullMessage.class)
-    public CompletableFuture<MessageEntity> updateMessage(
+    public MessageEntity updateMessage(
             @PathVariable("message_id") Long messageId,
             @RequestBody MessageEntity message){
 
