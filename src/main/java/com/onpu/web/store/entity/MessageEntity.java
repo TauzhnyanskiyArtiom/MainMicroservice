@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.onpu.web.api.views.Views;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "message")
 @Entity
+@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 public class MessageEntity extends AuditingEntity {
 
     @Id
@@ -33,6 +36,7 @@ public class MessageEntity extends AuditingEntity {
     @JsonView(Views.FullMessage.class)
     UserEntity author;
 
+    @NotAudited
     @OneToMany(mappedBy = "message", orphanRemoval = true)
     @JsonView(Views.FullMessage.class)
     List<CommentEntity> comments = new ArrayList<>();

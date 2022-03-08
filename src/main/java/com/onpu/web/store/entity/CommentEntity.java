@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.onpu.web.api.views.Views;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import javax.persistence.*;
 
@@ -18,6 +20,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Table(name = "comment")
 @Entity
+@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 public class CommentEntity extends AuditingEntity{
 
     @Id
