@@ -15,6 +15,7 @@ import com.onpu.web.store.repository.UserSubscriptionRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class MessageServiceImpl implements MessageService {
 
         channels.add(userEntity);
 
-        return messageRepository.findByAuthorIn(channels);
+        return messageRepository.findByAuthorIn(channels, Sort.by("id").descending());
     }
 
 

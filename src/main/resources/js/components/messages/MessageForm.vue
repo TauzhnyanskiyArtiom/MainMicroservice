@@ -57,7 +57,7 @@ export default {
               if (index > -1) {
                 this.messages.splice(index, 1, data)
               } else {
-                this.messages.push(data)
+                this.messages.unshift(data)
               }
             })
         )
