@@ -12,6 +12,6 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
     @EntityGraph(attributePaths = { "subscriptions", "subscribers" })
     Optional<UserEntity> findById(String id);
 
-    List<UserEntity> findAllByNameContainingIgnoreCase(String name);
-
+    @EntityGraph(attributePaths = { "subscriptions", "subscribers" })
+    UserEntity getById(String id);
 }

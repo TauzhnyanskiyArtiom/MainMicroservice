@@ -12,8 +12,10 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Data
-@EqualsAndHashCode( of = {"id"})
+@EqualsAndHashCode(of = {"id"})
+@ToString(exclude = {"comments"})
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
