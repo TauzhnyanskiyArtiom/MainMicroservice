@@ -32,6 +32,4 @@ public class RevisionEntity {
 
     String username;
 
-
-
 }

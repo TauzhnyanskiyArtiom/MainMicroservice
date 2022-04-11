@@ -38,7 +38,6 @@ public class MainController {
 
         if (oauthUser != null) {
             UserEntity userEntity = loggedUserService.getById(oauthUser.getName());
-
             data.put("profile", userEntity);
         }
 

@@ -3,15 +3,13 @@ package com.onpu.web.api.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.api.views.Views;
-import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.service.interfaces.SubscriptionService;
+import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.entity.UserSubscriptionEntity;
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

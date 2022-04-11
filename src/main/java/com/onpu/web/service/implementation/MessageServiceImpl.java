@@ -2,7 +2,6 @@ package com.onpu.web.service.implementation;
 
 import com.onpu.web.api.dto.EventType;
 import com.onpu.web.api.dto.ObjectType;
-import com.onpu.web.api.exception.NotFoundException;
 import com.onpu.web.api.util.WsSender;
 import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.MessageService;
@@ -17,15 +16,15 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class MessageServiceImpl implements MessageService {
 
@@ -58,30 +57,42 @@ public class MessageServiceImpl implements MessageService {
     }
 
 
+    @Transactional
     @Override
-    public MessageEntity updateMessage(Long messageId, MessageEntity message) {
+    public Optional<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
 
-        MessageEntity messageFromDb = getMessageEntity(messageId);
-        BeanUtils.copyProperties(message, messageFromDb, "id", "comments","author", "createdAt", "modifiedAt");
-        metaService.fillMeta(messageFromDb);
-        messageRepository.flush();
-        wsSender.accept(EventType.UPDATE, messageFromDb);
-
-
-        return messageFromDb;
-    }
-
-
-    @Override
-    public void deleteMessage(Long messageId) {
-        MessageEntity message = getMessageEntity(messageId);
-        messageRepository.delete(message);
-        wsSender.accept(EventType.REMOVE, message);
-
+        return messageRepository.findById(messageId)
+                .map(messageFromDb -> {
+                    BeanUtils.copyProperties(message, messageFromDb, "id", "comments", "author", "createdAt", "modifiedAt");
+                    metaService.fillMeta(messageFromDb);
+                    return messageRepository.saveAndFlush(messageFromDb);
+                }).map(messageFromDb -> {
+                    wsSender.accept(EventType.UPDATE, messageFromDb);
+                    return messageFromDb;
+                });
     }
 
     @Override
-    public MessageEntity createMessage(MessageEntity message, UserEntity user)  {
+    public Optional<MessageEntity> getMessageById(Long messageId) {
+        return messageRepository.findById(messageId);
+    }
+
+
+    @Transactional
+    @Override
+    public boolean deleteMessage(Long messageId) {
+        return messageRepository.findById(messageId)
+                .map(entity -> {
+                    messageRepository.delete(entity);
+                    messageRepository.flush();
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    @Transactional
+    @Override
+    public MessageEntity createMessage(MessageEntity message, UserEntity user) {
         message.setAuthor(user);
         metaService.fillMeta(message);
         MessageEntity savedMessage = messageRepository.save(message);
@@ -97,9 +108,5 @@ public class MessageServiceImpl implements MessageService {
                 .orElseGet(() -> messageRepository.findAll());
     }
 
-    private MessageEntity getMessageEntity(Long messageId) {
-        return messageRepository.findById(messageId)
-                .orElseThrow(() -> new NotFoundException("Message don`t found"));
-    }
 
 }

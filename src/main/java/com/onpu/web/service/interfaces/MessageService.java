@@ -9,9 +9,11 @@ import java.util.Optional;
 public interface MessageService {
     List<MessageEntity> findForUser(UserEntity userEntity);
 
-    MessageEntity updateMessage(Long messageId, MessageEntity message);
+    Optional<MessageEntity> updateMessage(Long messageId, MessageEntity message);
 
-    void deleteMessage(Long messageId);
+    Optional<MessageEntity> getMessageById(Long messageId);
+
+    boolean deleteMessage(Long messageId);
 
     MessageEntity createMessage(MessageEntity message, UserEntity user);
 

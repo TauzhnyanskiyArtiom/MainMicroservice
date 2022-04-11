@@ -8,12 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
+    @Transactional
     @Override
     public UserEntity create(UserEntity user) {
         return userRepository.saveAndFlush(user);

@@ -11,6 +11,7 @@ import com.onpu.web.store.repository.CommentRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.function.BiConsumer;
 
@@ -27,6 +28,7 @@ public class CommentServiceImpl implements CommentService {
         this.wsSender = wsSender.getSender(ObjectType.COMMENT, Views.FullComment.class);
     }
 
+    @Transactional
     @Override
     public CommentEntity create(CommentEntity comment, UserEntity user) {
         comment.setAuthor(user);

@@ -30,7 +30,7 @@ public class LoggedMessageService implements MessageService{
     }
 
     @Override
-    public MessageEntity updateMessage(Long messageId, MessageEntity message) {
+    public Optional<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
         log.info("Message id: " + messageId);
         log.info("Message new text: " + message.getText());
 
@@ -39,7 +39,13 @@ public class LoggedMessageService implements MessageService{
     }
 
     @Override
-    public void deleteMessage(Long messageId) {
+    public Optional<MessageEntity> getMessageById(Long messageId) {
+        log.info("Message id: " + messageId);
+        return messageServiceImpl.getMessageById(messageId);
+    }
+
+    @Override
+    public boolean deleteMessage(Long messageId) {
         log.info("Message id for delete:" + messageId);
 
         messageServiceImpl.deleteMessage(messageId);

@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService {
 
@@ -23,6 +25,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     UserSubscriptionRepository userSubscriptionRepository;
 
+    @Transactional
     @Override
     public UserEntity changeSubscription(UserEntity channel, UserEntity subscriber) {
         List<UserSubscriptionEntity> subscriptions = channel.getSubscribers()
@@ -47,6 +50,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return userSubscriptionRepository.findByChannel(channel);
     }
 
+    @Transactional
     @Override
     public UserSubscriptionEntity changeSubscriptionStatus(UserEntity channel, UserEntity subscriber) {
         System.out.println();
