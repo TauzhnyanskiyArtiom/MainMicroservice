@@ -48,7 +48,7 @@ public class LoggedMessageService implements MessageService{
     public boolean deleteMessage(Long messageId) {
         log.info("Message id for delete:" + messageId);
 
-        messageServiceImpl.deleteMessage(messageId);
+        return messageServiceImpl.deleteMessage(messageId);
     }
 
     @Override
