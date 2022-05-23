@@ -85,6 +85,7 @@ public class MessageServiceImpl implements MessageService {
                 .map(entity -> {
                     messageRepository.delete(entity);
                     messageRepository.flush();
+                    wsSender.accept(EventType.REMOVE, entity);
                     return true;
                 })
                 .orElse(false);

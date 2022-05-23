@@ -7,6 +7,12 @@
     <v-list-item-content>
       <v-list-item-title>{{comment.text}}</v-list-item-title>
     </v-list-item-content>
+
+    <v-list-item-action v-if="authorId === oauthUser.id">
+      <v-btn icon @click="del" large>
+        <v-icon>delete</v-icon>
+      </v-btn>
+    </v-list-item-action>
   </v-list-item>
 </template>
 
@@ -15,7 +21,19 @@ import UserLink from "components/UserLink.vue";
 export default {
   name: 'CommentItem',
   components: {UserLink},
-  props: ['comment']
+  props: ['comment', 'deleteComment', 'authorId'],
+
+  data() {
+    return {
+      oauthUser: frontendData.profile
+    }
+  },
+
+  methods:  {
+    del(){
+      this.deleteComment(this.comment)
+    }
+  }
 }
 </script>
 

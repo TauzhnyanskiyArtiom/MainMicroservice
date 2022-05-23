@@ -5,4 +5,6 @@ import com.onpu.web.store.entity.UserEntity;
 
 public interface CommentService {
     CommentEntity create(CommentEntity comment, UserEntity user);
+
+    boolean deleteMessage(Long commentId);
 }

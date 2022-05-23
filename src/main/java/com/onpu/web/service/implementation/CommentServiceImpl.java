@@ -36,4 +36,17 @@ public class CommentServiceImpl implements CommentService {
         wsSender.accept(EventType.CREATE, savedComment);
         return savedComment;
     }
+
+    @Transactional
+    @Override
+    public boolean deleteMessage(Long commentId) {
+        return  commentRepository.findById(commentId)
+                .map(entity -> {
+                    commentRepository.delete(entity);
+                    commentRepository.flush();
+                    wsSender.accept(EventType.REMOVE, entity);
+                    return true;
+                })
+                .orElse(false);
+    }
 }

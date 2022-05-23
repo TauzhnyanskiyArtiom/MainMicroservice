@@ -29,4 +29,10 @@ public class LoggedCommentService implements CommentService {
 
         return commentServiceImpl.create(comment, user);
     }
+
+    @Override
+    public boolean deleteMessage(Long commentId) {
+        log.info("Comment id for delete:" + commentId);
+        return commentServiceImpl.deleteMessage(commentId);
+    }
 }

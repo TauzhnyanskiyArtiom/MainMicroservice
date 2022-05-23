@@ -76,28 +76,41 @@ export default {
             }
             break
           case 'REMOVE':
-            if (index > -1)
+            if (index > -1) {
               this.messages.splice(index, 1)
+            }
             break
           default:
             console.error(`Looks like the event type if unknown "${data.eventType}"`)
         }
-      } else if (data.objectType === 'COMMENT' && data.eventType === 'CREATE') {
+      } else if (data.objectType === 'COMMENT') {
         const indMessage = this.messages.findIndex(item => item.id === data.body.message.id)
         if (indMessage > -1) {
-          const comments = this.messages[indMessage].comments
-          const indComment = comments.findIndex(item => item.id === data.body.id)
-          if (indComment > -1) {
-            comments.splice(indComment, 1, data.body)
-          } else {
-            comments.push(data.body)
+          switch (data.eventType) {
+            case 'CREATE':
+              if (indMessage > -1) {
+                const comments = this.messages[indMessage].comments
+                const indComment = comments.findIndex(item => item.id === data.body.id)
+                if (indComment > -1) {
+                  comments.splice(indComment, 1, data.body)
+                } else {
+                  comments.push(data.body)
+                }
+              }
+              break
+            case 'REMOVE':
+              if (indMessage > -1) {
+                const comments = this.messages[indMessage].comments
+                const indComment = comments.findIndex(item => item.id === data.body.id)
+                if (indComment > -1) {
+                  comments.splice(indComment, 1)
+                }
+              }
+              break
+            default:
+              console.error(`Looks like the event type if unknown "${data.eventType}"`)
           }
-
-        } else {
-          console.error(`This message doesn\`t exist`)
         }
-      } else {
-        console.error(`Looks like the object type if unknown "${data.objectType}"`)
       }
     })
   },
