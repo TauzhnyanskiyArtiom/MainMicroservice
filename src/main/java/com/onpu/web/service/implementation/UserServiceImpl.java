@@ -10,7 +10,6 @@ import com.onpu.web.store.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,14 +42,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserReadDto getOauthUser(String id) {
-        return findById(id).map(userReadMapper::map).orElse(null);
+        return userReadMapper.map(getById(id));
     }
 
     @Override
     public ProfileReadDto getProfile(String userId) {
-        final UserEntity profile = userRepository.getProfile(userId);
-        return profileReadMapper.map(profile);
-
+        return profileReadMapper.map(getById(userId));
     }
 
     @Override
