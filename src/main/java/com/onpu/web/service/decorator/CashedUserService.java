@@ -1,5 +1,7 @@
 package com.onpu.web.service.decorator;
 
+import com.onpu.web.api.dto.ProfileReadDto;
+import com.onpu.web.api.dto.UserReadDto;
 import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
@@ -28,7 +30,7 @@ public class CashedUserService implements UserService {
     public Optional<UserEntity> findById(String id) {
 
         if (cashedUsers.containsKey(id)) {
-            return Optional.of(cashedUsers.get(id));
+            return Optional.ofNullable(cashedUsers.get(id));
         }
 
         Optional<UserEntity> user = userServiceImpl.findById(id);
@@ -47,7 +49,17 @@ public class CashedUserService implements UserService {
     }
 
     @Override
-    public List<UserEntity> getAllUsers() {
+    public UserReadDto getOauthUser(String id) {
+        return userServiceImpl.getOauthUser(id);
+    }
+
+    @Override
+    public ProfileReadDto getProfile(String userId) {
+        return userServiceImpl.getProfile(userId);
+    }
+
+    @Override
+    public List<UserReadDto> getAllUsers() {
         return userServiceImpl.getAllUsers();
     }
 

@@ -66,4 +66,11 @@ public class LoggedMessageService implements MessageService{
 
         return messageServiceImpl.getListMessages(optionalPrefixName);
     }
+
+    @Override
+    public Optional<MessageEntity> findById(Long messageId) {
+        log.info("Find Message by id: " + messageId);
+
+        return messageServiceImpl.findById(messageId);
+    }
 }

@@ -1,5 +1,9 @@
 package com.onpu.web.service.implementation;
 
+import com.onpu.web.api.dto.ProfileReadDto;
+import com.onpu.web.api.dto.UserReadDto;
+import com.onpu.web.api.mapper.ProfileReadMapper;
+import com.onpu.web.api.mapper.UserReadMapper;
 import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
 import com.onpu.web.store.repository.UserRepository;
@@ -12,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
@@ -20,6 +25,10 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
+
+    UserReadMapper userReadMapper;
+
+    ProfileReadMapper profileReadMapper;
 
 
     @Override
@@ -33,8 +42,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntity> getAllUsers() {
-        return userRepository.findAll();
+    public UserReadDto getOauthUser(String id) {
+        return findById(id).map(userReadMapper::map).orElse(null);
+    }
+
+    @Override
+    public ProfileReadDto getProfile(String userId) {
+        final UserEntity profile = userRepository.getProfile(userId);
+        return profileReadMapper.map(profile);
+
+    }
+
+    @Override
+    public List<UserReadDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(userReadMapper::map)
+                .collect(Collectors.toList());
     }
 
     @Transactional

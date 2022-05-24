@@ -1,6 +1,7 @@
 package com.onpu.web.api.controller;
 
 
+import com.onpu.web.api.dto.UserReadDto;
 import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.service.interfaces.MessageService;
 import com.onpu.web.service.interfaces.UserService;
@@ -44,9 +45,9 @@ public class MainController {
         Map<Object, Object> data = new HashMap<>();
 
         if (oauthUser != null) {
-            UserEntity userEntity = loggedUserService.getById(oauthUser.getName());
+            UserReadDto userEntity = loggedUserService.getOauthUser(oauthUser.getName());
             data.put("profile", userEntity);
-            List<MessageEntity> messages = loggedMessageService.findForUser(userEntity);
+            List<MessageEntity> messages = loggedMessageService.findForUser(oauthUser.getUser());
             data.put("profile", userEntity);
             data.put("messages", messages);
         }

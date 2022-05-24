@@ -1,11 +1,9 @@
 package com.onpu.web.api.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import com.onpu.web.api.dto.CommentCreateDto;
+import com.onpu.web.api.dto.CommentReadDto;
 import com.onpu.web.api.oauth2.OAuth2User;
-import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.CommentService;
-import com.onpu.web.store.entity.CommentEntity;
-import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,15 +21,14 @@ public class CommentController {
     CommentService loggedCommentService;
 
     @PostMapping
-    @JsonView(Views.FullComment.class)
-    public CommentEntity createComment(
-            @RequestBody CommentEntity comment,
+    public CommentReadDto createComment(
+            @RequestBody CommentCreateDto comment,
             @AuthenticationPrincipal OAuth2User oauthUser
     ) {
-
-        UserEntity user = oauthUser.getUser();
-        return loggedCommentService.create(comment, user);
-    }
+        comment.setAuthorId(oauthUser.getName());
+        final CommentReadDto commentReadDto = loggedCommentService.create(comment);
+        return commentReadDto;
+   }
 
     @DeleteMapping("{comment_id}")
     public void deleteMessage(@PathVariable("comment_id") Long commentId) {

@@ -1,6 +1,7 @@
 package com.onpu.web.api.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.onpu.web.api.dto.ProfileReadDto;
 import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.SubscriptionService;
@@ -26,10 +27,10 @@ public class ProfileController {
     SubscriptionService loggedSubscriptionService;
 
     @GetMapping("{id}")
-    @JsonView(Views.FullProfile.class)
-    public UserEntity getProfile(@PathVariable("id") String userId) {
-        UserEntity user = loggedUserService.getById(userId);
-        return user;
+    public ProfileReadDto getProfile(@PathVariable("id") String userId) {
+
+        final ProfileReadDto profile = loggedUserService.getProfile(userId);
+        return profile;
     }
 
     @PostMapping("change-subscription/{channelId}")

@@ -19,4 +19,6 @@ public interface MessageService {
 
     List<MessageEntity> getListMessages(Optional<String> optionalPrefixName);
 
+    Optional<MessageEntity> findById(Long messageId);
+
 }

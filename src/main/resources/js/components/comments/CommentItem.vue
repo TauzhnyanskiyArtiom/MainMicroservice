@@ -8,7 +8,7 @@
       <v-list-item-title>{{comment.text}}</v-list-item-title>
     </v-list-item-content>
 
-    <v-list-item-action v-if="authorId === oauthUser.id || commet.author.id === oauthUser.id">
+    <v-list-item-action v-if="authorId === oauthUser.id || comment.author.id === oauthUser.id">
       <v-btn icon @click="del" large>
         <v-icon>delete</v-icon>
       </v-btn>

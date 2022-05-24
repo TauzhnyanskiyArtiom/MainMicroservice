@@ -67,59 +67,50 @@ export default {
   },
   created() {
     addHandler(data => {
-      if (data.objectType === 'MESSAGE') {
-        const index = this.messages.findIndex(item => item.id === data.body.id)
-        switch (data.eventType) {
-          case 'UPDATE':
+          console.log(data)
+          if (data.objectType === 'MESSAGE') {
+            const index = this.messages.findIndex(item => item.id === data.body.id)
             if (index > -1) {
-              this.messages.splice(index, 1, data.body)
-            }
-            break
-          case 'REMOVE':
-            if (index > -1) {
-              this.messages.splice(index, 1)
-            }
-            break
-          default:
-            console.error(`Looks like the event type if unknown "${data.eventType}"`)
-        }
-      } else if (data.objectType === 'COMMENT') {
-        const indMessage = this.messages.findIndex(item => item.id === data.body.message.id)
-        if (indMessage > -1) {
-          switch (data.eventType) {
-            case 'CREATE':
+              if (data.eventType === 'UPDATE')
+                this.messages.splice(index, 1, data.body)
+              else if (data.eventType === 'REMOVE')
+                this.messages.splice(index, 1)
+              else
+                console.error(`Looks like the event type if unknown "${data.eventType}"`)
+            } else if (data.objectType === 'COMMENT') {
+              console.log(this.messages)
+              const indMessage = this.messages.findIndex(item => item.id === data.body.message)
+              console.log(indMessage)
               if (indMessage > -1) {
-                const comments = this.messages[indMessage].comments
-                const indComment = comments.findIndex(item => item.id === data.body.id)
-                if (indComment > -1) {
-                  comments.splice(indComment, 1, data.body)
-                } else {
-                  comments.push(data.body)
+                if (data.eventType === 'CREATE') {
+                  const comments = this.messages[indMessage].comments
+                  console.log(comments)
+                  const indComment = comments.findIndex(item => item.id === data.body.id)
+                  console.log(indComment)
+                  if (indComment > -1) {
+                    comments.splice(indComment, 1, data.body)
+                  } else {
+                    comments.push(data.body)
+                  }
+                } else if (data.eventType === 'REMOVE') {
+                  const comments = this.messages[indMessage].comments
+                  const indComment = comments.findIndex(item => item.id === data.body.id)
+                  if (indComment > -1) {
+                    comments.splice(indComment, 1)
+                  }
                 }
               }
-              break
-            case 'REMOVE':
-              if (indMessage > -1) {
-                const comments = this.messages[indMessage].comments
-                const indComment = comments.findIndex(item => item.id === data.body.id)
-                if (indComment > -1) {
-                  comments.splice(indComment, 1)
-                }
-              }
-              break
-            default:
-              console.error(`Looks like the event type if unknown "${data.eventType}"`)
+            }
           }
-        }
+        })
+        },
+        beforeMount()
+    {
+      if (!this.profile) {
+        this.$router.replace('/auth')
       }
-    })
-  },
-  beforeMount() {
-    if (!this.profile) {
-      this.$router.replace('/auth')
     }
   }
-}
 </script>
 
 <style>

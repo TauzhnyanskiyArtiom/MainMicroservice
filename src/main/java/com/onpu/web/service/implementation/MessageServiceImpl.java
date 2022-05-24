@@ -45,14 +45,8 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<MessageEntity> findForUser(UserEntity userEntity) {
-        List<UserEntity> channels = userSubscriptionRepository.findBySubscriber(userEntity)
-                .stream()
-                .filter(UserSubscriptionEntity::isActive)
-                .map(UserSubscriptionEntity::getChannel)
-                .collect(Collectors.toList());
-
+        List<UserEntity> channels = userSubscriptionRepository.findBySubscriber(userEntity.getId());
         channels.add(userEntity);
-
         return messageRepository.findByAuthorIn(channels, Sort.by("id").descending());
     }
 
@@ -107,6 +101,11 @@ public class MessageServiceImpl implements MessageService {
         return optionalPrefixName
                 .map(messageRepository::findAllByTextContainingIgnoreCase)
                 .orElseGet(() -> messageRepository.findAll());
+    }
+
+    @Override
+    public Optional<MessageEntity> findById(Long messageId) {
+        return messageRepository.findById(messageId);
     }
 
 
