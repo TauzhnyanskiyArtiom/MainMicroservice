@@ -1,5 +1,6 @@
 package com.onpu.web.api.controller;
 
+import com.onpu.web.api.dto.UserReadDto;
 import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
@@ -23,14 +24,10 @@ public class UserController {
     UserService loggedUserService;
 
     @GetMapping
-    public List<UserEntity> getAllUsers(@AuthenticationPrincipal OAuth2User oauthUser){
-        List<UserEntity> users = loggedUserService.getAllUsers();
-
-        users = users.stream()
-                .filter(user -> !user.equals(oauthUser.getUser()))
+    public List<UserReadDto> getAllUsers(@AuthenticationPrincipal OAuth2User oauthUser){
+        return loggedUserService.getAllUsers().stream()
+                .filter(user -> !user.getId().equals(oauthUser.getName()))
                 .collect(Collectors.toList());
-
-        return users;
     }
 
 }

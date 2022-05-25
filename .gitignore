@@ -36,3 +36,4 @@ src/main/resources/application.yml
 target/*
 demo.iml
 node_modules
+compose-env.yml

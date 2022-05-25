@@ -10,11 +10,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class MessageController {
     @GetMapping
     @JsonView(Views.FullMessage.class)
     public List<MessageEntity> findForUser(
-            @AuthenticationPrincipal OAuth2User oauthUser){
+            @AuthenticationPrincipal OAuth2User oauthUser) {
 
         return loggedMessageService.findForUser(oauthUser.getUser());
     }
@@ -37,7 +38,7 @@ public class MessageController {
     @GetMapping("{message_id}")
     @JsonView(Views.FullMessage.class)
     public MessageEntity getOne(
-            @PathVariable(name = "message_id") MessageEntity message){
+            @PathVariable(name = "message_id") MessageEntity message) {
 
         return message;
     }
@@ -45,9 +46,9 @@ public class MessageController {
 
     @PostMapping
     @JsonView(Views.FullMessage.class)
-    public CompletableFuture<MessageEntity> addMessage(
+    public MessageEntity addMessage(
             @RequestBody MessageEntity message,
-            @AuthenticationPrincipal OAuth2User oauthUser){
+            @AuthenticationPrincipal OAuth2User oauthUser) {
 
         UserEntity user = oauthUser.getUser();
 
@@ -56,17 +57,19 @@ public class MessageController {
 
     @PutMapping("{message_id}")
     @JsonView(Views.FullMessage.class)
-    public CompletableFuture<MessageEntity> updateMessage(
+    public MessageEntity updateMessage(
             @PathVariable("message_id") Long messageId,
-            @RequestBody MessageEntity message){
+            @RequestBody MessageEntity message) {
 
-
-        return loggedMessageService.updateMessage(messageId, message);
+        return loggedMessageService
+                .updateMessage(messageId, message)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("{message_id}")
-    public void deleteMessage( @PathVariable("message_id") Long messageId) {
-        loggedMessageService.deleteMessage(messageId);
+    public void deleteMessage(@PathVariable("message_id") Long messageId) {
+        if (!loggedMessageService.deleteMessage(messageId))
+            new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
 }

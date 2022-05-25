@@ -56,6 +56,8 @@ public class OAuth2User implements OidcUser, Serializable {
         return oauth2User.getName();
     }
 
+    public String getUserName(){ return user.getName(); }
+
     public UserEntity getUser() {
         return user;
     }

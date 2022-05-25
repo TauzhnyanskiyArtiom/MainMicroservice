@@ -1,22 +1,16 @@
 package com.onpu.web.api.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import com.onpu.web.api.dto.CommentCreateDto;
+import com.onpu.web.api.dto.CommentReadDto;
 import com.onpu.web.api.oauth2.OAuth2User;
-import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.CommentService;
-import com.onpu.web.store.entity.CommentEntity;
-import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.transaction.Transactional;
-import java.util.concurrent.CompletableFuture;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,13 +21,18 @@ public class CommentController {
     CommentService loggedCommentService;
 
     @PostMapping
-    @JsonView(Views.FullComment.class)
-    public CompletableFuture<CommentEntity> createComment(
-            @RequestBody CommentEntity comment,
+    public CommentReadDto createComment(
+            @RequestBody CommentCreateDto comment,
             @AuthenticationPrincipal OAuth2User oauthUser
     ) {
+        comment.setAuthorId(oauthUser.getName());
+        final CommentReadDto commentReadDto = loggedCommentService.create(comment);
+        return commentReadDto;
+   }
 
-        UserEntity user = oauthUser.getUser();
-        return loggedCommentService.create(comment, user);
+    @DeleteMapping("{comment_id}")
+    public void deleteMessage(@PathVariable("comment_id") Long commentId) {
+        if (!loggedCommentService.deleteMessage(commentId))
+            new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 }

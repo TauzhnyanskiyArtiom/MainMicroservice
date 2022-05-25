@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -31,7 +30,7 @@ public class LoggedMessageService implements MessageService{
     }
 
     @Override
-    public CompletableFuture<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
+    public Optional<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
         log.info("Message id: " + messageId);
         log.info("Message new text: " + message.getText());
 
@@ -40,15 +39,20 @@ public class LoggedMessageService implements MessageService{
     }
 
     @Override
-    public CompletableFuture<Void> deleteMessage(Long messageId) {
-        log.info("Message id for delete:" + messageId);
-
-        messageServiceImpl.deleteMessage(messageId);
-        return null;
+    public Optional<MessageEntity> getMessageById(Long messageId) {
+        log.info("Message id: " + messageId);
+        return messageServiceImpl.getMessageById(messageId);
     }
 
     @Override
-    public CompletableFuture<MessageEntity> createMessage(MessageEntity message, UserEntity user) {
+    public boolean deleteMessage(Long messageId) {
+        log.info("Message id for delete:" + messageId);
+
+        return messageServiceImpl.deleteMessage(messageId);
+    }
+
+    @Override
+    public MessageEntity createMessage(MessageEntity message, UserEntity user) {
         log.info("Create message: ");
         log.info("User id: " + user.getId());
         log.info("Message text: " + message.getText());
@@ -61,5 +65,12 @@ public class LoggedMessageService implements MessageService{
         log.info("Search messages: " + optionalPrefixName.get());
 
         return messageServiceImpl.getListMessages(optionalPrefixName);
+    }
+
+    @Override
+    public Optional<MessageEntity> findById(Long messageId) {
+        log.info("Find Message by id: " + messageId);
+
+        return messageServiceImpl.findById(messageId);
     }
 }

@@ -2,7 +2,6 @@ package com.onpu.web.service.implementation;
 
 import com.onpu.web.api.dto.EventType;
 import com.onpu.web.api.dto.ObjectType;
-import com.onpu.web.api.exception.NotFoundException;
 import com.onpu.web.api.util.WsSender;
 import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.MessageService;
@@ -15,19 +14,17 @@ import com.onpu.web.store.repository.UserSubscriptionRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class MessageServiceImpl implements MessageService {
 
@@ -48,68 +45,54 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<MessageEntity> findForUser(UserEntity userEntity) {
-        List<UserEntity> channels = userSubscriptionRepository.findBySubscriber(userEntity)
-                .stream()
-                .filter(UserSubscriptionEntity::isActive)
-                .map(UserSubscriptionEntity::getChannel)
-                .collect(Collectors.toList());
-
+        List<UserEntity> channels = userSubscriptionRepository.findBySubscriber(userEntity.getId());
         channels.add(userEntity);
-
-        return messageRepository.findByAuthorIn(channels);
-    }
-
-    @Async
-    @Override
-    public CompletableFuture<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
-
-        CompletableFuture<MessageEntity> completableFutureMessage = CompletableFuture.supplyAsync(() -> {
-            MessageEntity messageFromDb = getMessageEntity(messageId);
-            BeanUtils.copyProperties(message, messageFromDb, "id", "comments","author");
-            return messageFromDb;
-
-        }).thenApplyAsync((resultMessage) -> {
-            metaService.fillMeta(resultMessage);
-            resultMessage.setCreationDate(LocalDateTime.now());
-            return resultMessage;
-        }).thenApplyAsync((resultMessage) -> messageRepository.saveAndFlush(resultMessage)
-        ).thenApplyAsync((resultMessage) -> {
-            wsSender.accept(EventType.UPDATE, resultMessage);
-            return resultMessage;
-        });
-
-
-        return completableFutureMessage;
+        return messageRepository.findByAuthorIn(channels, Sort.by("id").descending());
     }
 
 
-    @Async
+    @Transactional
     @Override
-    public CompletableFuture<Void> deleteMessage(Long messageId) {
-        CompletableFuture<Void> completableFuture = CompletableFuture.supplyAsync(() -> {
-            MessageEntity message = getMessageEntity(messageId);
-            messageRepository.delete(message);
-            return message;
-        }).thenAcceptAsync((resultMessage) -> wsSender.accept(EventType.REMOVE, resultMessage));
+    public Optional<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
 
-        return completableFuture;
-
+        return messageRepository.findById(messageId)
+                .map(messageFromDb -> {
+                    BeanUtils.copyProperties(message, messageFromDb, "id", "comments", "author", "createdAt", "modifiedAt");
+                    metaService.fillMeta(messageFromDb);
+                    return messageRepository.saveAndFlush(messageFromDb);
+                }).map(messageFromDb -> {
+                    wsSender.accept(EventType.UPDATE, messageFromDb);
+                    return messageFromDb;
+                });
     }
 
-    @Async
     @Override
-    public CompletableFuture<MessageEntity> createMessage(MessageEntity message, UserEntity user)  {
+    public Optional<MessageEntity> getMessageById(Long messageId) {
+        return messageRepository.findById(messageId);
+    }
 
-        CompletableFuture<MessageEntity> completableFutureMessage = CompletableFuture.supplyAsync(() -> {
-            message.setAuthor(user);
-            message.setCreationDate(LocalDateTime.now());
-            return message;
-        }).thenApplyAsync((resultMessage) -> {
-            metaService.fillMeta(resultMessage);
-            return resultMessage;
-        }).thenApplyAsync(resultMessage -> messageRepository.saveAndFlush(resultMessage));
 
-        return completableFutureMessage;
+    @Transactional
+    @Override
+    public boolean deleteMessage(Long messageId) {
+        return messageRepository.findById(messageId)
+                .map(entity -> {
+                    messageRepository.delete(entity);
+                    messageRepository.flush();
+                    wsSender.accept(EventType.REMOVE, entity);
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    @Transactional
+    @Override
+    public MessageEntity createMessage(MessageEntity message, UserEntity user) {
+        message.setAuthor(user);
+        metaService.fillMeta(message);
+        MessageEntity savedMessage = messageRepository.save(message);
+
+        return savedMessage;
     }
 
     @Override
@@ -120,9 +103,10 @@ public class MessageServiceImpl implements MessageService {
                 .orElseGet(() -> messageRepository.findAll());
     }
 
-    private MessageEntity getMessageEntity(Long messageId) {
-        return messageRepository.findById(messageId)
-                .orElseThrow(() -> new NotFoundException("Message don`t found"));
+    @Override
+    public Optional<MessageEntity> findById(Long messageId) {
+        return messageRepository.findById(messageId);
     }
+
 
 }

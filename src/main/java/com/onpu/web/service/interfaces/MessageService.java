@@ -5,17 +5,20 @@ import com.onpu.web.store.entity.UserEntity;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 public interface MessageService {
     List<MessageEntity> findForUser(UserEntity userEntity);
 
-    CompletableFuture<MessageEntity> updateMessage(Long messageId, MessageEntity message);
+    Optional<MessageEntity> updateMessage(Long messageId, MessageEntity message);
 
-    CompletableFuture<Void> deleteMessage(Long messageId);
+    Optional<MessageEntity> getMessageById(Long messageId);
 
-    CompletableFuture<MessageEntity> createMessage(MessageEntity message, UserEntity user);
+    boolean deleteMessage(Long messageId);
+
+    MessageEntity createMessage(MessageEntity message, UserEntity user);
 
     List<MessageEntity> getListMessages(Optional<String> optionalPrefixName);
+
+    Optional<MessageEntity> findById(Long messageId);
 
 }

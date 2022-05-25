@@ -11,7 +11,6 @@
             <v-layout column>
               <v-flex>{{profile.name}}</v-flex>
               <v-flex>{{profile.locale}}</v-flex>
-              <v-flex>{{profile.gender}}</v-flex>
               <v-flex>{{profile.lastVisit}}</v-flex>
               <v-flex>
                 {{profile.subscriptions && profile.subscriptions.length}} subscriptions
@@ -59,9 +58,11 @@
             this.$route.params.id === this.oauthUser.id
       },
       isISubscribed() {
+        console.log(this.profile.subscribers)
         return this.profile.subscribers &&
             this.profile.subscribers.find(subscription => {
-              return subscription.subscriber === this.oauthUser.id
+              console.log(subscription)
+              return subscription.subscriberId === this.oauthUser.id
             })
       }
     },

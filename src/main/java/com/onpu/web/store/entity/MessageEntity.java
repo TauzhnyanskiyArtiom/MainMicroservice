@@ -4,38 +4,41 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.onpu.web.api.views.Views;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Data
-@EqualsAndHashCode( of = {"id"})
+@EqualsAndHashCode(of = {"id"})
+@ToString(exclude = {"comments"})
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "message")
 @Entity
-public class MessageEntity {
+@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+public class MessageEntity extends AuditingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(Views.IdName.class)
     Long id;
 
     @JsonView(Views.IdName.class)
     String text;
 
-    @Column(updatable = false)
-    LocalDateTime creationDate;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonView(Views.FullMessage.class)
     UserEntity author;
 
+    @NotAudited
     @OneToMany(mappedBy = "message", orphanRemoval = true)
     @JsonView(Views.FullMessage.class)
     List<CommentEntity> comments = new ArrayList<>();

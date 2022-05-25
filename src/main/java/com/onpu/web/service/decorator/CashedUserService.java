@@ -1,5 +1,7 @@
 package com.onpu.web.service.decorator;
 
+import com.onpu.web.api.dto.ProfileReadDto;
+import com.onpu.web.api.dto.UserReadDto;
 import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
@@ -9,6 +11,7 @@ import lombok.experimental.NonFinal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,20 +28,38 @@ public class CashedUserService implements UserService {
 
     @Override
     public Optional<UserEntity> findById(String id) {
+
         if (cashedUsers.containsKey(id)) {
-            return Optional.of(cashedUsers.get(id));
+            return Optional.ofNullable(cashedUsers.get(id));
         }
 
         Optional<UserEntity> user = userServiceImpl.findById(id);
 
         user.ifPresent( u -> cashedUsers.put(u.getId(), u));
 
-
         return user;
     }
 
     @Override
-    public List<UserEntity> getAllUsers() {
+    public UserEntity getById(String id) {
+
+        return cashedUsers.compute(id, (k, v) ->
+                Objects.isNull(v) ? userServiceImpl.getById(id): v
+        );
+    }
+
+    @Override
+    public UserReadDto getOauthUser(String id) {
+        return userServiceImpl.getOauthUser(id);
+    }
+
+    @Override
+    public ProfileReadDto getProfile(String userId) {
+        return userServiceImpl.getProfile(userId);
+    }
+
+    @Override
+    public List<UserReadDto> getAllUsers() {
         return userServiceImpl.getAllUsers();
     }
 

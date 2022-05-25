@@ -1,15 +1,13 @@
 package com.onpu.web.service.decorator;
 
+import com.onpu.web.api.dto.CommentCreateDto;
+import com.onpu.web.api.dto.CommentReadDto;
 import com.onpu.web.service.interfaces.CommentService;
-import com.onpu.web.store.entity.CommentEntity;
-import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.CompletableFuture;
 
 
 @RequiredArgsConstructor
@@ -21,14 +19,19 @@ public class LoggedCommentService implements CommentService {
     CommentService commentServiceImpl;
 
 
+
     @Override
-    public CompletableFuture<CommentEntity> create(CommentEntity comment, UserEntity user) {
+    public CommentReadDto create(CommentCreateDto comment) {
         log.info("Create comment: ");
-        log.info("User id: " + user.getId());
+        log.info("User id: " + comment.getAuthorId());
         log.info("Comment text: " + comment.getText());
-        log.info("Message id: " + comment.getMessage().getId());
+        log.info("Message id: " + comment.getMessageId());
+        return commentServiceImpl.create(comment);
+    }
 
-
-        return commentServiceImpl.create(comment, user);
+    @Override
+    public boolean deleteMessage(Long commentId) {
+        log.info("Comment id for delete:" + commentId);
+        return commentServiceImpl.deleteMessage(commentId);
     }
 }

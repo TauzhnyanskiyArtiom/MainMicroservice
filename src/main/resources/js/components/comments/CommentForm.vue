@@ -28,7 +28,7 @@ export default {
   },
   methods: {
     save() {
-      commentsApi.add({text: this.text, message: {id: this.messageId}})
+      commentsApi.add({text: this.text, messageId: this.messageId})
           .then(result =>
               result.json().then(data => {
                 const index = this.comments.findIndex(item => item.id === data.id)

@@ -11,15 +11,16 @@
       </div>
     </v-card-text>
     <media v-if="message.link" :message="message"></media>
-    <v-card-actions v-if="oauthUser.name === message.author.name">
+    <v-card-actions v-if="oauthUser.id === message.author.id">
       <v-btn value="Edit" @click="edit" small text rounded>Edit</v-btn>
-      <v-btn icon @click="del" small>
+      <v-btn icon @click="del" large>
         <v-icon>delete</v-icon>
       </v-btn>
     </v-card-actions>
     <comment-list
         :comments="message.comments"
         :message-id="message.id"
+        :authorId="message.author.id"
     ></comment-list>
   </v-card>
 </template>

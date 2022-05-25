@@ -10,12 +10,15 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @JsonIgnoreProperties(value = {"applications", "hibernateLazyInitializer"})
 @Data
-@EqualsAndHashCode( of = {"id"})
+@EqualsAndHashCode(of = {"id"})
+@ToString(exclude = {"subscriptions", "subscribers"})
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -23,6 +26,9 @@ import java.util.Set;
 @Entity
 @Table(name = "usr")
 public class UserEntity implements Serializable {
+
+    @Transient
+    private static final long serialVersionUID = 1L;
 
     @Id
     @JsonView(Views.IdName.class)
@@ -41,6 +47,7 @@ public class UserEntity implements Serializable {
     @JsonView(Views.FullProfile.class)
     LocalDateTime lastVisit;
 
+    @Builder.Default
     @JsonView(Views.FullProfile.class)
     @OneToMany(
             mappedBy = "subscriber",
@@ -48,6 +55,7 @@ public class UserEntity implements Serializable {
     )
     private Set<UserSubscriptionEntity> subscriptions = new HashSet<>();
 
+    @Builder.Default
     @JsonView(Views.FullProfile.class)
     @OneToMany(
             mappedBy = "channel",
@@ -55,7 +63,6 @@ public class UserEntity implements Serializable {
             cascade = CascadeType.ALL
     )
     private Set<UserSubscriptionEntity> subscribers = new HashSet<>();
-
 
 
 }

@@ -2,7 +2,7 @@
   <v-container>
     <v-layout align-space-around justify-start column>
       <message-form :messages="messages" :messageAttr="message"/>
-      <message-row v-for="message in sortedMessages" :key="message.id" :message="message" :editMessage="editMessage"
+      <message-row v-for="message in messages" :key="message.id" :message="message" :editMessage="editMessage"
                    :deleteMessage="deleteMessage" :messages="messages"/>
     </v-layout>
   </v-container>
@@ -21,14 +21,14 @@
         data() {
             return {
                 message: null,
-                messages: [],
+                messages: frontendData.messages,
             }
         },
-        computed: {
-          sortedMessages() {
-            return (this.messages || []).sort((a, b) => -(a.id - b.id))
-          }
-        },
+        // computed: {
+        //   sortedMessages() {
+        //     return (this.messages || []).sort((a, b) => -(a.id - b.id))
+        //   }
+        // },
         methods: {
             editMessage(message) {
                 this.message = message
@@ -43,13 +43,13 @@
                 })
                 this.message = null
             }
-        },
-        beforeMount() {
-          this.$resource('/api/messages').get().then(result =>
-              result.json().then(data => {
-                this.messages = data
-              }))
         }
+        // beforeMount() {
+        //   this.$resource('/api/messages').get().then(result =>
+        //       result.json().then(data => {
+        //         this.messages = data
+        //       }))
+        // }
     }
 </script>
 
