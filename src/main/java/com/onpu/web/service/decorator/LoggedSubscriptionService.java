@@ -1,13 +1,13 @@
 package com.onpu.web.service.decorator;
 
+import com.onpu.web.api.dto.ProfileReadDto;
+import com.onpu.web.api.dto.SubscriptionReadDto;
 import com.onpu.web.service.interfaces.SubscriptionService;
 import com.onpu.web.store.entity.UserEntity;
-import com.onpu.web.store.entity.UserSubscriptionEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class LoggedSubscriptionService implements SubscriptionService {
 
 
     @Override
-    public UserEntity changeSubscription(UserEntity channel, UserEntity subscriber) {
+    public ProfileReadDto changeSubscription(UserEntity channel, UserEntity subscriber) {
         log.info("Change subscription: ");
         log.info("Channel id: " + channel.getId());
         log.info("Subscriber text: " + subscriber.getId());
@@ -32,7 +32,7 @@ public class LoggedSubscriptionService implements SubscriptionService {
     }
 
     @Override
-    public List<UserSubscriptionEntity> getSubscribers(UserEntity channel) {
+    public List<SubscriptionReadDto> getSubscribers(UserEntity channel) {
         log.info("Get subscribers: ");
         log.info("Channel id: " + channel.getId());
         log.info("Channel name: " + channel.getName());
@@ -41,7 +41,7 @@ public class LoggedSubscriptionService implements SubscriptionService {
     }
 
     @Override
-    public UserSubscriptionEntity changeSubscriptionStatus(UserEntity channel, UserEntity subscriber) {
+    public SubscriptionReadDto changeSubscriptionStatus(UserEntity channel, UserEntity subscriber) {
         log.info("Change subscription status: ");
         log.info("Channel id: " + channel.getId());
         log.info("Subscriber text: " + subscriber.getId());

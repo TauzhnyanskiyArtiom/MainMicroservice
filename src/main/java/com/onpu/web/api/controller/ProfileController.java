@@ -1,13 +1,11 @@
 package com.onpu.web.api.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.onpu.web.api.dto.ProfileReadDto;
+import com.onpu.web.api.dto.SubscriptionReadDto;
 import com.onpu.web.api.oauth2.OAuth2User;
-import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.SubscriptionService;
 import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.UserEntity;
-import com.onpu.web.store.entity.UserSubscriptionEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,23 +32,18 @@ public class ProfileController {
     }
 
     @PostMapping("change-subscription/{channelId}")
-    @JsonView(Views.FullProfile.class)
-    public UserEntity changeSubscription(
+    public ProfileReadDto changeSubscription(
             @AuthenticationPrincipal OAuth2User oauthUser,
             @PathVariable("channelId") String channelId
     ) {
         UserEntity channel = loggedUserService.getById(channelId);
         UserEntity subscriber = oauthUser.getUser();
-        if (subscriber.equals(channel)) {
-            return channel;
-        } else {
-            return loggedSubscriptionService.changeSubscription(channel, subscriber);
-        }
+
+        return loggedSubscriptionService.changeSubscription(channel, subscriber);
     }
 
     @GetMapping("get-subscribers/{channelId}")
-    @JsonView(Views.IdName.class)
-    public List<UserSubscriptionEntity> subscribers(
+    public List<SubscriptionReadDto> subscribers(
             @PathVariable("channelId") String channelId
     ) {
         UserEntity channel = loggedUserService.getById(channelId);
@@ -58,8 +51,7 @@ public class ProfileController {
     }
 
     @PostMapping("change-status/{subscriberId}")
-    @JsonView(Views.IdName.class)
-    public UserSubscriptionEntity changeSubscriptionStatus(
+    public SubscriptionReadDto changeSubscriptionStatus(
             @AuthenticationPrincipal OAuth2User oauthUser,
             @PathVariable("subscriberId") String subscriberId
     ) {
