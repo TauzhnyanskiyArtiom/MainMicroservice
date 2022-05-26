@@ -1,7 +1,9 @@
 package com.onpu.web.api.controller;
 
 
+import com.onpu.web.api.dto.MessageReadDto;
 import com.onpu.web.api.dto.UserReadDto;
+import com.onpu.web.api.mapper.UserReadMapper;
 import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.service.interfaces.MessageService;
 import com.onpu.web.service.interfaces.UserService;
@@ -33,7 +35,7 @@ public class MainController {
     @Value("${spring.profiles.active:prod}")
     String profile;
 
-    UserService loggedUserService;
+    UserReadMapper userReadMapper;
 
     MessageService loggedMessageService;
 
@@ -45,9 +47,9 @@ public class MainController {
         Map<Object, Object> data = new HashMap<>();
 
         if (oauthUser != null) {
-            UserReadDto userEntity = loggedUserService.getOauthUser(oauthUser.getName());
+            UserReadDto userEntity = userReadMapper.map(oauthUser.getUser());
             data.put("profile", userEntity);
-            List<MessageEntity> messages = loggedMessageService.findForUser(oauthUser.getUser());
+            List<MessageReadDto> messages = loggedMessageService.findForUser(oauthUser.getUser());
             data.put("profile", userEntity);
             data.put("messages", messages);
         }

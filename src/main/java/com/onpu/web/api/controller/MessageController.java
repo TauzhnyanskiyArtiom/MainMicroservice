@@ -1,11 +1,10 @@
 package com.onpu.web.api.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import com.onpu.web.api.dto.MessageCreateDto;
+import com.onpu.web.api.dto.MessageReadDto;
 import com.onpu.web.api.oauth2.OAuth2User;
-import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.MessageService;
 import com.onpu.web.store.entity.MessageEntity;
-import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,38 +27,35 @@ public class MessageController {
 
 
     @GetMapping
-    @JsonView(Views.FullMessage.class)
-    public List<MessageEntity> findForUser(
+    public List<MessageReadDto> findForUser(
             @AuthenticationPrincipal OAuth2User oauthUser) {
 
         return loggedMessageService.findForUser(oauthUser.getUser());
     }
 
     @GetMapping("{message_id}")
-    @JsonView(Views.FullMessage.class)
-    public MessageEntity getOne(
-            @PathVariable(name = "message_id") MessageEntity message) {
+    public MessageReadDto getOne(
+            @PathVariable("message_id") Long messageId) {
 
-        return message;
+        return loggedMessageService.getMessageById(messageId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
 
     @PostMapping
-    @JsonView(Views.FullMessage.class)
-    public MessageEntity addMessage(
-            @RequestBody MessageEntity message,
+    public MessageReadDto addMessage(
+            @RequestBody MessageCreateDto message,
             @AuthenticationPrincipal OAuth2User oauthUser) {
 
-        UserEntity user = oauthUser.getUser();
+        message.setAuthorId(oauthUser.getName());
 
-        return loggedMessageService.createMessage(message, user);
+        return loggedMessageService.createMessage(message);
     }
 
     @PutMapping("{message_id}")
-    @JsonView(Views.FullMessage.class)
-    public MessageEntity updateMessage(
+    public MessageReadDto updateMessage(
             @PathVariable("message_id") Long messageId,
-            @RequestBody MessageEntity message) {
+            @RequestBody MessageCreateDto message) {
 
         return loggedMessageService
                 .updateMessage(messageId, message)
@@ -69,7 +65,7 @@ public class MessageController {
     @DeleteMapping("{message_id}")
     public void deleteMessage(@PathVariable("message_id") Long messageId) {
         if (!loggedMessageService.deleteMessage(messageId))
-            new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
 }

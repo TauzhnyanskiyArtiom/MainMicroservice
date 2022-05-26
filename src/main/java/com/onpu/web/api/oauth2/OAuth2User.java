@@ -15,6 +15,8 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OAuth2User implements OidcUser, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     OidcUser oauth2User;
 
     UserEntity user;
@@ -23,7 +25,6 @@ public class OAuth2User implements OidcUser, Serializable {
         this.oauth2User = oauth2User;
         this.user = user;
     }
-
 
 
     @Override

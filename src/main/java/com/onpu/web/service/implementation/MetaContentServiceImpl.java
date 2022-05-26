@@ -8,7 +8,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
@@ -27,6 +26,11 @@ public class MetaContentServiceImpl implements MetaContentService {
     @Override
     public void fillMeta(MessageEntity message) {
         String text = message.getText();
+        message.setLink(null);
+        message.setLinkCover(null);
+        message.setLinkTitle(null);
+        message.setLinkDescription(null);
+
         Matcher matcher = URL_REGEX.matcher(text);
 
         if (matcher.find()) {

@@ -1,14 +1,16 @@
 package com.onpu.web.service.implementation;
 
 import com.onpu.web.api.dto.EventType;
+import com.onpu.web.api.dto.MessageCreateDto;
+import com.onpu.web.api.dto.MessageReadDto;
 import com.onpu.web.api.dto.ObjectType;
+import com.onpu.web.api.mapper.MessageCreateMapper;
+import com.onpu.web.api.mapper.MessageReadMapper;
 import com.onpu.web.api.util.WsSender;
-import com.onpu.web.api.views.Views;
 import com.onpu.web.service.interfaces.MessageService;
 import com.onpu.web.service.interfaces.MetaContentService;
 import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
-import com.onpu.web.store.entity.UserSubscriptionEntity;
 import com.onpu.web.store.repository.MessageRepository;
 import com.onpu.web.store.repository.UserSubscriptionRepository;
 import lombok.AccessLevel;
@@ -28,47 +30,54 @@ import java.util.stream.Collectors;
 @Service
 public class MessageServiceImpl implements MessageService {
 
-    MessageRepository messageRepository;
-
     MetaContentService metaService;
+
+    MessageReadMapper messageReadMapper;
+
+    MessageCreateMapper messageCreateMapper;
+
+    MessageRepository messageRepository;
 
     BiConsumer<EventType, MessageEntity> wsSender;
 
     UserSubscriptionRepository userSubscriptionRepository;
 
-    public MessageServiceImpl(MessageRepository messageRepository, MetaContentService metaService, WsSender wsSender, UserSubscriptionRepository userSubscriptionRepository) {
+    public MessageServiceImpl(MessageRepository messageRepository, MetaContentService metaService, MessageReadMapper messageReadMapper, MessageCreateMapper messageCreateMapper, WsSender wsSender, UserSubscriptionRepository userSubscriptionRepository) {
         this.messageRepository = messageRepository;
         this.metaService = metaService;
-        this.wsSender = wsSender.getSender(ObjectType.MESSAGE, Views.FullMessage.class);
+        this.messageReadMapper = messageReadMapper;
+        this.messageCreateMapper = messageCreateMapper;
+        this.wsSender = wsSender.getSender(ObjectType.MESSAGE);
         this.userSubscriptionRepository = userSubscriptionRepository;
     }
 
     @Override
-    public List<MessageEntity> findForUser(UserEntity userEntity) {
+    public List<MessageReadDto> findForUser(UserEntity userEntity) {
         List<UserEntity> channels = userSubscriptionRepository.findBySubscriber(userEntity.getId());
         channels.add(userEntity);
-        return messageRepository.findByAuthorIn(channels, Sort.by("id").descending());
+        List<MessageEntity> messages = messageRepository.findByAuthorIn(channels, Sort.by("id").descending());
+        return messages.stream().map(messageReadMapper::map).collect(Collectors.toList());
     }
 
 
     @Transactional
     @Override
-    public Optional<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
+    public Optional<MessageReadDto> updateMessage(Long messageId, MessageCreateDto message) {
 
         return messageRepository.findById(messageId)
                 .map(messageFromDb -> {
-                    BeanUtils.copyProperties(message, messageFromDb, "id", "comments", "author", "createdAt", "modifiedAt");
+                    messageFromDb.setText(message.getText());
                     metaService.fillMeta(messageFromDb);
                     return messageRepository.saveAndFlush(messageFromDb);
                 }).map(messageFromDb -> {
                     wsSender.accept(EventType.UPDATE, messageFromDb);
                     return messageFromDb;
-                });
+                }).map(messageReadMapper::map);
     }
 
     @Override
-    public Optional<MessageEntity> getMessageById(Long messageId) {
-        return messageRepository.findById(messageId);
+    public Optional<MessageReadDto> getMessageById(Long messageId) {
+        return messageRepository.findById(messageId).map(messageReadMapper::map);
     }
 
 
@@ -87,20 +96,24 @@ public class MessageServiceImpl implements MessageService {
 
     @Transactional
     @Override
-    public MessageEntity createMessage(MessageEntity message, UserEntity user) {
-        message.setAuthor(user);
-        metaService.fillMeta(message);
-        MessageEntity savedMessage = messageRepository.save(message);
-
-        return savedMessage;
+    public MessageReadDto createMessage(MessageCreateDto message) {
+        return Optional.of(message)
+                .map(messageCreateMapper::map)
+                .map(ms -> {
+                    metaService.fillMeta(ms);
+                    return messageRepository.saveAndFlush(ms);
+                })
+                .map(messageReadMapper::map).orElse(null);
     }
 
     @Override
-    public List<MessageEntity> getListMessages(Optional<String> optionalPrefixName) {
+    public List<MessageReadDto> getListMessages(Optional<String> optionalPrefixName) {
         optionalPrefixName = optionalPrefixName.filter(prefixName -> !prefixName.trim().isEmpty());
         return optionalPrefixName
                 .map(messageRepository::findAllByTextContainingIgnoreCase)
-                .orElseGet(() -> messageRepository.findAll());
+                .orElseGet(() -> messageRepository.findAll())
+                .stream().map(messageReadMapper::map)
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.onpu.web.service.interfaces;
 
+import com.onpu.web.api.dto.MessageCreateDto;
+import com.onpu.web.api.dto.MessageReadDto;
 import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
 
@@ -7,17 +9,17 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MessageService {
-    List<MessageEntity> findForUser(UserEntity userEntity);
+    List<MessageReadDto> findForUser(UserEntity userEntity);
 
-    Optional<MessageEntity> updateMessage(Long messageId, MessageEntity message);
+    Optional<MessageReadDto> updateMessage(Long messageId, MessageCreateDto message);
 
-    Optional<MessageEntity> getMessageById(Long messageId);
+    Optional<MessageReadDto> getMessageById(Long messageId);
 
     boolean deleteMessage(Long messageId);
 
-    MessageEntity createMessage(MessageEntity message, UserEntity user);
+    MessageReadDto createMessage(MessageCreateDto message);
 
-    List<MessageEntity> getListMessages(Optional<String> optionalPrefixName);
+    List<MessageReadDto> getListMessages(Optional<String> optionalPrefixName);
 
     Optional<MessageEntity> findById(Long messageId);
 

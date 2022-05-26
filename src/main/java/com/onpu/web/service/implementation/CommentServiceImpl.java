@@ -32,7 +32,7 @@ public class CommentServiceImpl implements CommentService {
         this.commentCreateMapper = commentCreateMapper;
         this.commentReadMapper = commentReadMapper;
         this.commentRepository = commentRepository;
-        this.wsSender = wsSender.getSenderNew(ObjectType.COMMENT);
+        this.wsSender = wsSender.getSender(ObjectType.COMMENT);
     }
 
     @Transactional

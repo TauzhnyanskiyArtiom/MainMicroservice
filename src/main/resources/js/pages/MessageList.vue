@@ -24,11 +24,6 @@
                 messages: frontendData.messages,
             }
         },
-        // computed: {
-        //   sortedMessages() {
-        //     return (this.messages || []).sort((a, b) => -(a.id - b.id))
-        //   }
-        // },
         methods: {
             editMessage(message) {
                 this.message = message

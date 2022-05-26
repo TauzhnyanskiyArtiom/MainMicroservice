@@ -17,7 +17,6 @@ public interface MessageRepository extends
         RevisionRepository<MessageEntity, Long, Long> {
 
     @Override
-//    @EntityGraph("withCommentsAndAuthor")
     @Query("select m from MessageEntity m " +
             "left join fetch m.comments c " +
             "join fetch m.author u " +
@@ -26,6 +25,7 @@ public interface MessageRepository extends
             "where m.id = :messageId")
     Optional<MessageEntity> findById(Long messageId);
 
+    @EntityGraph(attributePaths = { "comments" })
     List<MessageEntity> findAllByTextContainingIgnoreCase(String prefixName);
 
     @EntityGraph(attributePaths = { "comments" })

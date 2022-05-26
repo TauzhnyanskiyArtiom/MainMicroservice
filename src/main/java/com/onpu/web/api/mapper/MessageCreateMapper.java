@@ -1,6 +1,7 @@
 package com.onpu.web.api.mapper;
 
 import com.onpu.web.api.dto.CommentCreateDto;
+import com.onpu.web.api.dto.MessageCreateDto;
 import com.onpu.web.service.interfaces.MessageService;
 import com.onpu.web.service.interfaces.UserService;
 import com.onpu.web.store.entity.CommentEntity;
@@ -16,17 +17,15 @@ import java.util.Optional;
 @Component
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
-public class CommentCreateMapper implements Mapper<CommentCreateDto, CommentEntity> {
+public class MessageCreateMapper implements Mapper<MessageCreateDto, MessageEntity> {
 
     UserService loggedUserService;
 
-    MessageService loggedMessageService;
-
     @Override
-    public CommentEntity map(CommentCreateDto object) {
-        return CommentEntity.builder()
+    public MessageEntity map(MessageCreateDto object) {
+
+        return MessageEntity.builder()
                 .text(object.getText())
-                .message(getMessage(object.getMessageId()))
                 .author(getAuthor(object.getAuthorId()))
                 .build();
     }
@@ -36,8 +35,4 @@ public class CommentCreateMapper implements Mapper<CommentCreateDto, CommentEnti
                 .map(loggedUserService::getById).orElse(null);
     }
 
-    private MessageEntity getMessage(Long messageId) {
-        return Optional.of(messageId)
-                .flatMap(loggedMessageService::findById).orElse(null);
-    }
 }
