@@ -25,14 +25,12 @@ public class CommentController {
             @RequestBody CommentCreateDto comment,
             @AuthenticationPrincipal OAuth2User oauthUser
     ) {
-        comment.setAuthorId(oauthUser.getName());
-        final CommentReadDto commentReadDto = loggedCommentService.create(comment);
-        return commentReadDto;
+        return loggedCommentService.create(comment);
    }
 
     @DeleteMapping("{comment_id}")
     public void deleteMessage(@PathVariable("comment_id") Long commentId) {
         if (!loggedCommentService.deleteMessage(commentId))
-            new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 }

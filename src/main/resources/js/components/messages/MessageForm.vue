@@ -39,7 +39,8 @@ export default {
     save() {
       const message = {
         id: this.id,
-        text: this.text
+        text: this.text,
+        authorId: frontendData.profile.id
       }
       if (this.id) {
         messagesApi.update(message).then(result =>

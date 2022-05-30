@@ -2,13 +2,13 @@ package com.onpu.web.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @AllArgsConstructor
 public class WsEventDto {
-    private ObjectType objectType;
-    private EventType eventType;
+    ObjectType objectType;
+    EventType eventType;
     @JsonRawValue
-    private String body;
+    String body;
 }

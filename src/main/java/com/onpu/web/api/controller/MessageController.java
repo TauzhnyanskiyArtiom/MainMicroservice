@@ -4,7 +4,6 @@ import com.onpu.web.api.dto.MessageCreateDto;
 import com.onpu.web.api.dto.MessageReadDto;
 import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.service.interfaces.MessageService;
-import com.onpu.web.store.entity.MessageEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -44,10 +43,7 @@ public class MessageController {
 
     @PostMapping
     public MessageReadDto addMessage(
-            @RequestBody MessageCreateDto message,
-            @AuthenticationPrincipal OAuth2User oauthUser) {
-
-        message.setAuthorId(oauthUser.getName());
+            @RequestBody MessageCreateDto message) {
 
         return loggedMessageService.createMessage(message);
     }

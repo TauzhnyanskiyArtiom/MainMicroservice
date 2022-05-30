@@ -1,12 +1,12 @@
 package com.onpu.web.api.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @AllArgsConstructor
 public class MetaDto {
-    private String title;
-    private String description;
-    private String cover;
+    String title;
+    String description;
+    String cover;
 }
