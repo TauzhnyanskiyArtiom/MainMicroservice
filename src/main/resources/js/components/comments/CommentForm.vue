@@ -30,11 +30,8 @@ export default {
     save() {
       const comment = {
         text: this.text,
-        messageId: this.messageId,
-        authorId: frontendData.profile.id
+        messageId: this.messageId
       }
-
-
       commentsApi.add(comment)
           .then(result =>
               result.json().then(data => {

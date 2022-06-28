@@ -23,15 +23,15 @@ public class LoggedCommentService implements CommentService {
     @Override
     public CommentReadDto create(CommentCreateDto comment) {
         log.info("Create comment: ");
-        log.info("User id: " + comment.getAuthorId());
+        log.info("User id: " + comment.getAuthor().getId());
         log.info("Comment text: " + comment.getText());
         log.info("Message id: " + comment.getMessageId());
         return commentServiceImpl.create(comment);
     }
 
     @Override
-    public boolean deleteMessage(Long commentId) {
+    public boolean deleteComment(Long commentId) {
         log.info("Comment id for delete:" + commentId);
-        return commentServiceImpl.deleteMessage(commentId);
+        return commentServiceImpl.deleteComment(commentId);
     }
 }

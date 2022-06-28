@@ -69,6 +69,7 @@ export default {
     addHandler(data => {
       console.log(data)
       if (data.objectType === 'MESSAGE') {
+        console.log(data)
         const index = this.messages.findIndex(item => item.id === data.body.id)
         if (index > -1)
           if (data.eventType === 'UPDATE')

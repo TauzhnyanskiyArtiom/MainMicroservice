@@ -21,7 +21,7 @@
         data() {
             return {
                 message: null,
-                messages: frontendData.messages,
+                messages: [],
             }
         },
         methods: {
@@ -38,13 +38,10 @@
                 })
                 this.message = null
             }
+        },
+        beforeMount() {
+            this.messages = frontendData.messages
         }
-        // beforeMount() {
-        //   this.$resource('/api/messages').get().then(result =>
-        //       result.json().then(data => {
-        //         this.messages = data
-        //       }))
-        // }
     }
 </script>
 

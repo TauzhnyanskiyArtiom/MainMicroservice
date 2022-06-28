@@ -6,9 +6,6 @@ import com.onpu.web.api.dto.UserReadDto;
 import com.onpu.web.api.mapper.UserReadMapper;
 import com.onpu.web.api.oauth2.OAuth2User;
 import com.onpu.web.service.interfaces.MessageService;
-import com.onpu.web.service.interfaces.UserService;
-import com.onpu.web.store.entity.MessageEntity;
-import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -49,6 +46,7 @@ public class MainController {
         if (oauthUser != null) {
             UserReadDto userEntity = userReadMapper.map(oauthUser.getUser());
             data.put("profile", userEntity);
+
             List<MessageReadDto> messages = loggedMessageService.findForUser(oauthUser.getUser());
             data.put("profile", userEntity);
             data.put("messages", messages);
