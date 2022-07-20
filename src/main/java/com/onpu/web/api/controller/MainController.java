@@ -47,9 +47,9 @@ public class MainController {
             UserReadDto userEntity = userReadMapper.map(oauthUser.getUser());
             data.put("profile", userEntity);
 
-            List<MessageReadDto> messages = loggedMessageService.findForUser(oauthUser.getUser());
+//            List<MessageReadDto> messages = loggedMessageService.findForUser(oauthUser.getUser());
             data.put("profile", userEntity);
-            data.put("messages", messages);
+//            data.put("messages", messages);
         }
 
         model.addAttribute("frontendData", data);

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -68,6 +69,23 @@ public class CashedUserService implements UserService {
         userServiceImpl.create(user);
         cashedUsers.put(user.getId(), user);
         return user;
+    }
+
+    @Override
+    public UserEntity uploadAvatar(MultipartFile image, UserEntity user) {
+        if (cashedUsers.containsKey(user.getId())){
+            cashedUsers.remove(user.getId());
+        }
+
+        UserEntity savedUser = userServiceImpl.uploadAvatar(image, user);
+
+        cashedUsers.put(savedUser.getId(), savedUser);
+        return savedUser;
+    }
+
+    @Override
+    public Optional<byte[]> findAvatar(String id) {
+        return userServiceImpl.findAvatar(id);
     }
 
 
