@@ -7,7 +7,7 @@ import lombok.Value;
 @Value
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserSubscriptionReadDto {
-    String channelId;
-    String subscriberId;
+public class SubscriptionReadDto {
+    UserReadDto subscriber;
+    boolean active;
 }

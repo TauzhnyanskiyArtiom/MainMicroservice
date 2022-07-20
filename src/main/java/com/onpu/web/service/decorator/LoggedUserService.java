@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +59,19 @@ public class LoggedUserService implements UserService {
     public UserEntity create(UserEntity user) {
         log.info("Save user: " + user.getName() + " id : " + user.getId());
         return cashedUserService.create(user);
+    }
+
+    @Override
+    public UserEntity uploadAvatar(MultipartFile image, UserEntity user) {
+        log.info("Upload image: " + image.getName());
+        log.info("User: " + user.getId());
+        return cashedUserService.uploadAvatar(image, user);
+    }
+
+    @Override
+    public Optional<byte[]> findAvatar(String id) {
+        log.info("Get image: " + id);
+        return cashedUserService.findAvatar(id);
     }
 
 }

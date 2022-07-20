@@ -1,7 +1,8 @@
 package com.onpu.web.service.decorator;
 
+import com.onpu.web.api.dto.MessageCreateDto;
+import com.onpu.web.api.dto.MessageReadDto;
 import com.onpu.web.service.interfaces.MessageService;
-import com.onpu.web.store.entity.MessageEntity;
 import com.onpu.web.store.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class LoggedMessageService implements MessageService{
     MessageService messageServiceImpl;
 
     @Override
-    public List<MessageEntity> findForUser(UserEntity userEntity) {
+    public List<MessageReadDto> findForUser(UserEntity userEntity) {
         log.info("Messages for user:");
         log.info("User id: " + userEntity.getId());
         log.info("User name: " + userEntity.getName());
@@ -30,7 +31,7 @@ public class LoggedMessageService implements MessageService{
     }
 
     @Override
-    public Optional<MessageEntity> updateMessage(Long messageId, MessageEntity message) {
+    public MessageReadDto updateMessage(Long messageId, MessageCreateDto message) {
         log.info("Message id: " + messageId);
         log.info("Message new text: " + message.getText());
 
@@ -38,11 +39,6 @@ public class LoggedMessageService implements MessageService{
 
     }
 
-    @Override
-    public Optional<MessageEntity> getMessageById(Long messageId) {
-        log.info("Message id: " + messageId);
-        return messageServiceImpl.getMessageById(messageId);
-    }
 
     @Override
     public boolean deleteMessage(Long messageId) {
@@ -52,23 +48,17 @@ public class LoggedMessageService implements MessageService{
     }
 
     @Override
-    public MessageEntity createMessage(MessageEntity message, UserEntity user) {
+    public MessageReadDto createMessage(MessageCreateDto message) {
         log.info("Create message: ");
-        log.info("User id: " + user.getId());
+        log.info("User id: " + message.getAuthor().getId());
         log.info("Message text: " + message.getText());
 
-        return messageServiceImpl.createMessage(message, user);
+        return messageServiceImpl.createMessage(message);
     }
 
-    @Override
-    public List<MessageEntity> getListMessages(Optional<String> optionalPrefixName) {
-        log.info("Search messages: " + optionalPrefixName.get());
-
-        return messageServiceImpl.getListMessages(optionalPrefixName);
-    }
 
     @Override
-    public Optional<MessageEntity> findById(Long messageId) {
+    public Optional<MessageReadDto> findById(Long messageId) {
         log.info("Find Message by id: " + messageId);
 
         return messageServiceImpl.findById(messageId);

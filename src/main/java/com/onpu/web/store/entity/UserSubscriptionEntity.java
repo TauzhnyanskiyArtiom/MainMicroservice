@@ -1,7 +1,9 @@
 package com.onpu.web.store.entity;
 
-import com.fasterxml.jackson.annotation.*;
-import com.onpu.web.api.views.Views;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -21,7 +23,6 @@ public class UserSubscriptionEntity implements Serializable {
 
     @MapsId("channelId")
     @ManyToOne(fetch = FetchType.EAGER)
-    @JsonView(Views.IdName.class)
     @JsonIdentityReference
     @JsonIdentityInfo(
             property = "id",
@@ -31,7 +32,6 @@ public class UserSubscriptionEntity implements Serializable {
 
     @MapsId("subscriberId")
     @ManyToOne(fetch = FetchType.EAGER)
-    @JsonView(Views.IdName.class)
     @JsonIdentityReference
     @JsonIdentityInfo(
             property = "id",
@@ -39,7 +39,6 @@ public class UserSubscriptionEntity implements Serializable {
     )
     UserEntity subscriber;
 
-    @JsonView(Views.IdName.class)
     boolean active;
 
     public UserSubscriptionEntity(UserEntity channel, UserEntity subscriber) {

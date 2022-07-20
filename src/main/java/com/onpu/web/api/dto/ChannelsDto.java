@@ -1,13 +1,12 @@
 package com.onpu.web.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Builder;
 import lombok.Value;
 
+import java.util.List;
+
 @Value
-@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserSubscriptionReadDto {
-    String channelId;
-    String subscriberId;
+public class ChannelsDto {
+    List<String> channelsId;
 }

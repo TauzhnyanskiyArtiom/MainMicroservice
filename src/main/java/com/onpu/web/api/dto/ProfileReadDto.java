@@ -1,14 +1,13 @@
 package com.onpu.web.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.onpu.web.store.entity.UserSubscriptionEntity;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Value
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProfileReadDto {

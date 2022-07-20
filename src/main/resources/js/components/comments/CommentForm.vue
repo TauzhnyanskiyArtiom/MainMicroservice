@@ -23,12 +23,16 @@ export default {
   props: ['messageId', 'comments'],
   data() {
     return {
-      text: ''
+      text: '',
     }
   },
   methods: {
     save() {
-      commentsApi.add({text: this.text, messageId: this.messageId})
+      const comment = {
+        text: this.text,
+        messageId: this.messageId
+      }
+      commentsApi.add(comment)
           .then(result =>
               result.json().then(data => {
                 const index = this.comments.findIndex(item => item.id === data.id)

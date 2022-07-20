@@ -10,5 +10,5 @@ import lombok.Data;
 public class CommentCreateDto {
     String text;
     Long messageId;
-    String authorId;
+    UserReadDto author;
 }

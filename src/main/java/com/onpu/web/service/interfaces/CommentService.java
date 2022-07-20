@@ -6,5 +6,5 @@ import com.onpu.web.api.dto.CommentReadDto;
 public interface CommentService {
     CommentReadDto create(CommentCreateDto comment);
 
-    boolean deleteMessage(Long commentId);
+    boolean deleteComment(Long commentId);
 }

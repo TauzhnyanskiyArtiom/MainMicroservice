@@ -6,7 +6,7 @@ let stompClient = null
 const handlers = []
 
 export function connect() {
-    const socket = new SockJS('/websocket')
+    const socket = new SockJS('http://localhost:9090/websocket')
     stompClient = Stomp.over(socket)
     stompClient.connect({}, frame => {
         console.log('Connected: ' + frame)

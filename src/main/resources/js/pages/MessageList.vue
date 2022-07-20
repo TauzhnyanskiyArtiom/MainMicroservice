@@ -21,14 +21,9 @@
         data() {
             return {
                 message: null,
-                messages: frontendData.messages,
+                messages: [],
             }
         },
-        // computed: {
-        //   sortedMessages() {
-        //     return (this.messages || []).sort((a, b) => -(a.id - b.id))
-        //   }
-        // },
         methods: {
             editMessage(message) {
                 this.message = message
@@ -43,13 +38,10 @@
                 })
                 this.message = null
             }
+        },
+        beforeMount() {
+            this.messages = frontendData.messages
         }
-        // beforeMount() {
-        //   this.$resource('/api/messages').get().then(result =>
-        //       result.json().then(data => {
-        //         this.messages = data
-        //       }))
-        // }
     }
 </script>
 
